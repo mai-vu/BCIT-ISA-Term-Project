@@ -1,6 +1,7 @@
 export const messages = {
     title: "Chatbot",
-    test: "ChatAMAT",
+    header: "ChatAMAT",
     submitButton: "Submit",
+    footer: "By Team pU2"
 };
 

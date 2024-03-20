@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
     <title id="title"></title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -13,10 +17,26 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
-<body>
-    <h3 id="test"></h3>
-    <textarea id="userInput"></textarea>
-    <button id="submitButton"></button>
+<body class="text-center">
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+        <header class="masthead mb-auto">
+          <div class="inner">
+            <h3 id="header" class="masthead-brand"></h3>
+            </nav>
+          </div>
+        </header>
+  
+        <main role="main" class="inner cover">
+            <textarea id="userInput"></textarea>
+            <button id="submitButton"></button>
+        </main>
+  
+        <footer class="mastfoot mt-auto">
+          <div class="inner">
+            <p id="footer"></p>
+          </div>
+        </footer>
+      </div>
 
     <script src="js/script.js" type="module"></script>
 </body>
