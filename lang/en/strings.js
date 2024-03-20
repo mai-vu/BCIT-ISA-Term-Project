@@ -1,5 +1,6 @@
 export const messages = {
     title: "Chatbot",
-    test: "testDiv"
+    test: "ChatAMAT",
+    submitButton: "Submit",
 };
 

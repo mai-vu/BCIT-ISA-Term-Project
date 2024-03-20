@@ -5,6 +5,7 @@ import { messages } from '../lang/en/strings.js';
 function replaceElementContents() {
     document.getElementById('title').textContent = messages.title;
     document.getElementById('test').textContent = messages.test;
+    document.getElementById('submitButton').textContent = messages.submitButton;
 }
 
 // Call the function when the DOM content is loaded
