@@ -8,4 +8,6 @@ export const messages = {
     login: "Login",
     signup: "Sign Up",
     forgotPassword: "Forgot your Password?",
+    welcome: "Welcome to ChatAMAT!",
+    getStarted: "Log in or sign up to get started.",
 };

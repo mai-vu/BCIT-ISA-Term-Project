@@ -29,13 +29,11 @@
       <div class="col-md-6 col-lg-4">
         <div class="card text-center fixed-card bg-body-tertiary" style="margin-top: 5%">
           <div class="card-body py-4 px-3 text-center" style="font-family: comfortaaBold; max-width: 200%;">
-            <h5 class="card-title">Welcome!</h5>
-            <p class="card-text">Sign up or log in to get started.</p>
+            <h5 class="card-title" id="welcome"></h5>
+            <p class="card-text" id="getStarted"></p>
             <div class="d-flex justify-content-center">
-              <a href="/signup" class="btn btn-lg btn-primary me-2" style="background-color: rgb(153, 77, 191);">Sign
-                Up</a>
-              <a href="/login" class="btn btn-lg btn-secondary ms-2" style="background-color: rgb(212, 85, 195);">Log
-                In</a>
+              <a href="/signup" id="signupButton" class="btn btn-lg btn-primary me-2"></a>
+              <a href="/login" id="loginButton" class="btn btn-lg btn-secondary ms-2"></a>
             </div>
           </div>
         </div>
@@ -43,4 +41,7 @@
     </div>
 
   </main>
+
+  <script type="module" src="lang/en/strings.js"></script>
+  <script type="module" src="../scripts/indexPage.js"></script>
 </body>

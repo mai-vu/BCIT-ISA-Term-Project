@@ -15,3 +15,11 @@
 .custom-header {
     background-color: rgb(228, 90, 228);
 }
+
+#signupButton {
+    background-color: rgb(153, 77, 191);
+}
+
+#loginButton {
+    background-color: rgb(212, 85, 195);
+}
