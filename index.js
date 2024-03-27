@@ -1,43 +1,31 @@
-// Import the messages object from lang/en/strings.js
-import { messages } from './lang/en/strings.js';
+const express = require('express');
 
-const apiUrl = "http://server2:3000/query";
+const app = express();
+const port = process.env.PORT || 8000;
 
-// Function to replace element contents with strings from messages object
-function replaceElementContents() {
-    // Replace title
-    document.getElementById('title').textContent = messages.title;
-    document.getElementById('searchHeader').textContent = messages.searchHeader;
-    document.getElementById('insertRows').textContent = messages.insertRows;
-    document.getElementById('submitQuery').textContent = messages.submitQuery;
-}
+app.use(express.urlencoded({
+    extended: false
+}));
 
-// Call the function when the DOM content is loaded
-document.addEventListener('DOMContentLoaded', replaceElementContents);
+//Index page, gatekeeps if user is logged in
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
-function insertRows() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", apiUrl + "/query", true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            document.getElementById("response").innerHTML = xhr.responseText;
-        }
-    };
-    xhr.send();
-}
+app.get('/login', (req, res) => {
+    res.sendFile(__dirname + '/html/login.html');
+});
 
-function executeQuery() {
-    const query = document.getElementById("query").value;
-    const method = query.toLowerCase().includes("insert") ? "POST" : "GET";
-    const xhr = new XMLHttpRequest();
-    xhr.open(method, apiUrl + "query", true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            document.getElementById("response").innerHTML = xhr.responseText;
-        }
-    };
-    xhr.send(JSON.stringify({ query: query }));
-}
+app.get('/signup', (req, res) => {
+    res.sendFile(__dirname + '/html/signup.html');
+});
 
-console.log("index.js loaded.");
+app.use(express.static(__dirname + "/"));
+
+app.get("*", (req, res) => {
+    res.status(404).render("404");
+  })
+  
+  app.listen(port, () => {
+      console.log("Node application listening on port " + port);
+  });
