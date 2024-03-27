@@ -44,7 +44,19 @@ app.get('/signup', (req, res) => {
 
 app.get('/home', (req, res) => {
     // Check if the user is authenticated
-    res.sendFile(path.join(__dirname, 'html', 'home.html'));
+    const token = req.cookies.token;
+    if (!token) {
+        res.redirect('/');
+        return;
+    } else {
+        jwt.verify(token, SECRET_KEY, async (error, decoded) => {
+            if (error) {
+                res.redirect('/');
+                return;
+            }
+            res.sendFile(path.join(__dirname, 'html', 'home.html'));
+        });
+    }
 });
 
 
@@ -67,7 +79,7 @@ app.post('/signup', async (req, res) => {
         }
 
         // Insert the new user into the database with hashed password
-        await usersCollection.insertOne({ email, password: hashedPassword });
+        await usersCollection.insertOne({ email, password: hashedPassword, API_calls: 0, role: 'user'});
 
         // Generate a JWT token for the user
         const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
@@ -115,6 +127,11 @@ app.post('/login', async (req, res) => {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
+});
+
+app.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/');
 });
 
 // Handle 404 errors
