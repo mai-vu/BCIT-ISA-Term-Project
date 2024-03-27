@@ -1,31 +1,34 @@
-const express = require('express');
+import express, { urlencoded } from 'express';
+import path from 'path';
 
+const __dirname = path.resolve();
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.use(express.urlencoded({
-    extended: false
-}));
+// Parse URL-encoded bodies (as sent by HTML forms)
+app.use(express.urlencoded({ extended: false }));
 
-//Index page, gatekeeps if user is logged in
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, '')));
+
+// Index page, gatekeeps if user is logged in
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(__dirname + '/html/login.html');
+    res.sendFile(path.join(__dirname, 'html', 'login.html'));
 });
 
 app.get('/signup', (req, res) => {
-    res.sendFile(__dirname + '/html/signup.html');
+    res.sendFile(path.join(__dirname, 'html', 'signup.html'));
 });
 
-app.use(express.static(__dirname + "/"));
-
+// Handle 404 errors
 app.get("*", (req, res) => {
-    res.status(404).render("404");
-  })
-  
-  app.listen(port, () => {
-      console.log("Node application listening on port " + port);
-  });
+    res.status(404).send("404 Not Found");
+});
+
+app.listen(port, () => {
+    console.log("Node application listening on port " + port);
+});
