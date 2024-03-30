@@ -49,8 +49,8 @@ document.getElementById('submitButton').addEventListener('click', function() {
     .then(response => response.json())
     .then(data => {
         console.log("Response:", data);
-        let query = document.createElement('h3');
-        query.textContent = text;
+        let query = document.createElement('h4');
+        query.textContent = '"' + text + '"';
         document.getElementById('chatbox').appendChild(query);
         let response = document.createElement('p');
         response.textContent = data.prediction;
