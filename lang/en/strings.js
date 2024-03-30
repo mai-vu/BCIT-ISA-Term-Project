@@ -10,4 +10,5 @@ export const messages = {
     forgotPassword: "Forgot your Password?",
     welcome: "Welcome to ChatAMAT!",
     getStarted: "Log in or sign up to get started.",
+    usageCount: "Usage Count: ", 
 };

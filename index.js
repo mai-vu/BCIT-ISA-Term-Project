@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 const mongoURI = dotenv.config().parsed.DB_URL;
 const __dirname = path.resolve();
@@ -13,7 +14,13 @@ const port = process.env.PORT || 8000;
 const saltRounds = 10;
 const db = dotenv.config().parsed.DB;
 const SECRET_KEY = dotenv.config().parsed.SECRET_KEY;
+const SESSION_KEY = dotenv.config().parsed.SESSION_KEY;
 
+app.use(session({
+    secret: SESSION_KEY,
+    resave: false,
+    saveUninitialized: true
+}));
 app.use(cookieParser());
 app.use(express.json());
 // Parse URL-encoded bodies (as sent by HTML forms)
@@ -59,38 +66,30 @@ app.get('/home', (req, res) => {
     }
 });
 
-
-// Signup Route
-app.post('/signup', async (req, res) => {
+app.get('/usagecount', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const email = req.session.email;
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        console.log('Email:', email);
 
         // Connect to the database
         const usersCollection = await connectToDatabase();
 
-        // Check if the user already exists
-        const existingUser = await usersCollection.findOne({ email });
-        if (existingUser) {
-            res.redirect('/login');
+        // Find the user by email
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
             return;
         }
 
-        // Insert the new user into the database with hashed password
-        await usersCollection.insertOne({ email, password: hashedPassword, API_calls: 0, role: 'user'});
+        // Retrieve the API_calls count for the user
+        const apiCalls = user.API_calls || 0;
 
-        // Generate a JWT token for the user
-        const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
-
-        // Set the token as an HTTPOnly cookie
-        res.cookie('token', token, { httpOnly: true });
-
-        res.redirect('/home');
+        res.json({ apiCalls }); // Send the API_calls count as JSON response
     } catch (error) {
-        console.error('Error during signup:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Error fetching API calls count:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -116,6 +115,9 @@ app.post('/login', async (req, res) => {
             return;
         }
 
+        // Store email in session
+        req.session.email = email;
+
         // Generate a JWT token for the user
         const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
 
@@ -128,6 +130,44 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+// Signup Route
+app.post('/signup', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Check if the user already exists
+        const existingUser = await usersCollection.findOne({ email });
+        if (existingUser) {
+            res.redirect('/login');
+            return;
+        }
+
+        // Insert the new user into the database with hashed password
+        await usersCollection.insertOne({ email, password: hashedPassword, API_calls: 0, role: 'user'});
+
+        // Store email in session
+        req.session.email = email;
+
+        // Generate a JWT token for the user
+        const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
+
+        // Set the token as an HTTPOnly cookie
+        res.cookie('token', token, { httpOnly: true });
+
+        res.redirect('/home');
+    } catch (error) {
+        console.error('Error during signup:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 app.get('/logout', (req, res) => {
     res.clearCookie('token');
