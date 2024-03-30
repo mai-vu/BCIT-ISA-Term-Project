@@ -18,9 +18,6 @@ function replaceElementContents() {
 // Call the function when the DOM content is loaded
 document.addEventListener('DOMContentLoaded', replaceElementContents);
 
-document.getElementById('submitButton').addEventListener('click', function() {
-    let text = document.getElementById('userInput').value;
-    let data = { text: text };
 // Function to fetch and update the usage count
 async function updateUsageCount() {
     try {
@@ -37,6 +34,10 @@ async function updateUsageCount() {
 
 // Call the function to update the usage count initially
 updateUsageCount();
+
+document.getElementById('submitButton').addEventListener('click', function() {
+    let text = document.getElementById('userInput').value;
+    let data = { text: text };
 
     fetch(apiUrl, {
       method: 'POST',
