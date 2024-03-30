@@ -49,7 +49,7 @@ document.getElementById('submitButton').addEventListener('click', function() {
     .then(response => response.json())
     .then(data => {
         console.log("Response:", data);
-        let query = document.createElement('h4');
+        let query = document.createElement('h5');
         query.textContent = '"' + text + '"';
         document.getElementById('chatbox').appendChild(query);
         let response = document.createElement('p');
