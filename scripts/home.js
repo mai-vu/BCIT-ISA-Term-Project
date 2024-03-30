@@ -8,6 +8,11 @@ const apiUrl = "https://www.alexkong.xyz/proj/predict";
 function replaceElementContents() {
     // Replace title
     document.getElementById('title').textContent = messages.title;
+    // document.getElementById('title').textContent = messages.title;
+    // document.getElementById('searchHeader').textContent = messages.searchHeader;
+    // document.getElementById('insertRows').textContent = messages.insertRows;
+    // document.getElementById('submitQuery').textContent = messages.submitQuery;
+    document.getElementById('usageCount').innerText = messages.usageCount
 }
 
 // Call the function when the DOM content is loaded
@@ -16,6 +21,22 @@ document.addEventListener('DOMContentLoaded', replaceElementContents);
 document.getElementById('submitButton').addEventListener('click', function() {
     let text = document.getElementById('userInput').value;
     let data = { text: text };
+// Function to fetch and update the usage count
+async function updateUsageCount() {
+    try {
+        // Fetch the usage count from the server
+        const response = await fetch('/usagecount');
+        const data = await response.json();
+        
+        // Update the usage count in the span element
+        document.getElementById('usageCount').innerText += data.apiCalls;
+    } catch (error) {
+        console.error('Error updating usage count:', error);
+    }
+}
+
+// Call the function to update the usage count initially
+updateUsageCount();
 
     fetch(apiUrl, {
       method: 'POST',
