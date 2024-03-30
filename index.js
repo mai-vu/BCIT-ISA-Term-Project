@@ -66,7 +66,23 @@ app.get('/home', (req, res) => {
     }
 });
 
-app.get('/usagecount', async (req, res) => {
+app.get('/admin', (req, res) => {
+    // Check if the user is authenticated
+    const token = req.cookies.token;
+    if (!token) {
+        res.redirect('/');
+        return;
+    }
+    jwt.verify(token, SECRET_KEY, async (error, decoded) => {
+        if (error) {
+            res.redirect('/');
+            return;
+        }
+        res.sendFile(path.join(__dirname, 'html', 'admin.html'));
+    });
+});
+
+app.get('/users/usagecount', async (req, res) => {
     try {
         const email = req.session.email;
 
@@ -87,6 +103,32 @@ app.get('/usagecount', async (req, res) => {
         const apiCalls = user.API_calls || 0;
 
         res.json({ apiCalls }); // Send the API_calls count as JSON response
+    } catch (error) {
+        console.error('Error fetching API calls count:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/users/role', async (req, res) => {
+    try {
+        const email = req.session.email;
+
+        console.log('Email:', email);
+
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const role = user.role;
+
+        res.json({ role }); // Send the user's role as JSON response
     } catch (error) {
         console.error('Error fetching API calls count:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -124,7 +166,12 @@ app.post('/login', async (req, res) => {
         // Set the token as an HTTPOnly cookie
         res.cookie('token', token, { httpOnly: true });
 
-        res.redirect('/home');
+        // Redirect based on user's role
+        if (existingUser.role === 'admin') {
+            res.redirect('/admin');
+        } else {
+            res.redirect('/home');
+        }
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -161,7 +208,12 @@ app.post('/signup', async (req, res) => {
         // Set the token as an HTTPOnly cookie
         res.cookie('token', token, { httpOnly: true });
 
-        res.redirect('/home');
+        // Redirect based on user's role
+        if (existingUser.role === 'admin') {
+            res.redirect('/admin');
+        } else {
+            res.redirect('/home');
+        }
     } catch (error) {
         console.error('Error during signup:', error);
         res.status(500).json({ message: 'Internal server error' });

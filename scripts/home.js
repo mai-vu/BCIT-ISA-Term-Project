@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', replaceElementContents);
 async function updateUsageCount() {
     try {
         // Fetch the usage count from the server
-        const response = await fetch('/usagecount');
+        const response = await fetch('users/usagecount');
         const data = await response.json();
         
         // Update the usage count in the span element
@@ -33,8 +33,6 @@ async function updateUsageCount() {
 
 // Call the function to update the usage count initially
 updateUsageCount();
-
-
 
 function insertRows() {
     const xhr = new XMLHttpRequest();
