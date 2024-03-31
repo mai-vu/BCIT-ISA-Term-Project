@@ -36,7 +36,7 @@ async function fetchUsersData() {
 
 // Function to populate the table with users data
 async function populateUserTable() {
-    const usersList = document.getElementById('userTable');
+    const usersList = document.querySelector('#userTable tbody');
 
     // Fetch users data from the server
     const usersData = await fetchUsersData();
@@ -55,6 +55,7 @@ async function populateUserTable() {
         usersList.innerHTML += row;
     });
 }
+
 
 // Call populateUserTable() when the page loads
 window.onload = populateUserTable;
