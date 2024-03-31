@@ -11,6 +11,8 @@ function replaceElementContents() {
   // Don't need usagecount for admin page
   // document.getElementById('usageCount').innerText = messages.usageCount
   document.getElementById('logoutButton').textContent = messages.logout;
+  document.getElementById('tableHeaderEmail').textContent = messages.tableHeaderEmail;
+    document.getElementById('tableHeaderUsageCount').textContent = messages.tableHeaderUsageCount;
 }
 
 // Call the function when the DOM content is loaded
