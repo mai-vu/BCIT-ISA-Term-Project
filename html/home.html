@@ -26,44 +26,33 @@
       <img src="/favicon/favicon-32x32.png" class="logo">
     </div>
     <div>
-      <a href="/logout" class="btn btn-sm btn-outline-light">Logout</a>
+      <a href="/logout" id="logoutButton" class="btn btn-sm btn-outline-light"></a>
     </div>
 
   </header>
 
 
-
-  <main role="main" class="flex-grow-1 flex-column min-vh-100 text-center">
-    <div class="containerd-flex ">
-      <div class="row">
-        <div class="col">
-          <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example"
-            tabindex="0">
-            <h4 id="scrollspyHeading1">First heading</h4>
-            <p>...</p>
-            <h4 id="scrollspyHeading2">Second heading</h4>
-            <p>...</p>
-            <h4 id="scrollspyHeading3">Third heading</h4>
-            <p>...</p>
-            <h4 id="scrollspyHeading4">Fourth heading</h4>
-            <p>...</p>
-            <h4 id="scrollspyHeading5">Fifth heading</h4>
-            <p>...</p>
-            <!-- Add more content here if needed -->
+  <div id="main-content">
+    <main role="main" class="flex-grow-1 flex-column min-vh-80 text-center">
+      <div class="containerd-flex ">
+        <div class="row">
+          <div class="col">
+            <div id="chatbox" data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0"
+              class="scrollspy-example" tabindex="0">
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <footer class="py-3 mt-auto bg-dark text-white">
-    <div class="container text-center">
-      <textarea id="userInput" class="form-control mb-2" placeholder="Enter your text"></textarea>
-      <button id="submitButton" class="btn btn-primary">Submit</button>
-      <p id="footer" class="mt-2"></p>
-    </div>
-  </footer>
-
+    <footer class="py-3 mt-auto bg-dark text-white">
+      <div class="container text-center">
+        <textarea id="userInput" class="form-control mb-2" placeholder="Enter your text"></textarea>
+        <button id="submitButton" class="btn btn-primary">Submit</button>
+        <p id="footer" class="mt-2"></p>
+      </div>
+    </footer>
+  </div>
   <script src="../scripts/home.js" type="module"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
