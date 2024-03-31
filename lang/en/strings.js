@@ -2,8 +2,10 @@ export const messages = {
     // Universal
     title: "Chatbot",
     header: "ChatAMAT",
-    submitButton: "Submit",
     footer: "By Team pU2",
+    usageCount: "Usage Count: ", 
+
+    // Landing Page
     email: "Email",
     password: "Password",
     login: "Login",
@@ -12,10 +14,10 @@ export const messages = {
     forgotPassword: "Forgot your Password?",
     welcome: "Welcome to ChatAMAT!",
     getStarted: "Log in or sign up to get started.",
-    usageCount: "Usage Count: ", 
 
     // Home
     home: "Chatbot Home",
+    submitButton: "Submit",
 
     // Admin Dashboard
     adminTitle: "Admin Dashboard",
