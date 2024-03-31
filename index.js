@@ -7,14 +7,15 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 
-const mongoURI = dotenv.config().parsed.DB_URL;
+dotenv.config();
+const mongoURI = process.env.DB_URL;
 const __dirname = path.resolve();
 const app = express();
 const port = process.env.PORT || 8000;
 const saltRounds = 10;
-const db = dotenv.config().parsed.DB;
-const SECRET_KEY = dotenv.config().parsed.SECRET_KEY;
-const SESSION_KEY = dotenv.config().parsed.SESSION_KEY;
+const db = process.env.DB;
+const SECRET_KEY = process.env.SECRET_KEY;
+const SESSION_KEY = process.env.SESSION_KEY;
 
 app.use(session({
     secret: SESSION_KEY,
