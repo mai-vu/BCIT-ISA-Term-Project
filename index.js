@@ -160,6 +160,7 @@ app.post('/login', async (req, res) => {
 
         // Check if the user exists
         const existingUser = await usersCollection.findOne({ email });
+
         if (!existingUser) {
             res.redirect('/signup');
             return;
@@ -174,6 +175,9 @@ app.post('/login', async (req, res) => {
 
         // Store email in session
         req.session.email = email;
+
+        //get user uid and assign to session
+        req.session.uid = existingUser._id.toString();
 
         // Generate a JWT token for the user
         const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
