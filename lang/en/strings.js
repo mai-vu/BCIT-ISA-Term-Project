@@ -6,9 +6,12 @@ export const messages = {
     email: "Email",
     password: "Password",
     login: "Login",
+    logout: "Logout",
     signup: "Sign Up",
     forgotPassword: "Forgot your Password?",
     welcome: "Welcome to ChatAMAT!",
     getStarted: "Log in or sign up to get started.",
     usageCount: "Usage Count: ", 
+    home: "Chatbot Home",
+
 };
