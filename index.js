@@ -83,6 +83,24 @@ app.get('/admin', (req, res) => {
     });
 });
 
+// Add a new route to fetch users and their usage count
+app.get('/admin/users', async (req, res) => {
+    try {
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Find all users
+        const users = await usersCollection.find().toArray();
+
+        // Send the users data as JSON response
+        res.json(users);
+    } catch (error) {
+        console.error('Error fetching users data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 app.get('/users/usagecount', async (req, res) => {
     try {
         const email = req.session.email;
