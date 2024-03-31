@@ -74,6 +74,8 @@ document.getElementById('submitButton').addEventListener('click', function () {
   };
 
   // Send the user input to the server
+  let submitButton = document.getElementById('submitButton');
+  submitButton.disabled = true; // Disable the submit button while waiting for the response
   fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -107,7 +109,7 @@ document.getElementById('submitButton').addEventListener('click', function () {
       // Remove the loading indicator on error
       document.getElementById('chatbox').removeChild(loadingBubble);
       console.error('Error:', error);
-    });
+    })
 });
 
 // Function to filter the response and remove repetitive text
