@@ -1,21 +1,18 @@
-html {
+html, body {
     height: 100%;
 }
 
 #main-content {
-    font-family: 'segoe ui', sans-serif;
-    display: flex;
-    flex-direction: column;
-    min-height: 99vh;
-    /* max-width: 99vw; */
-  }
-
-main {
-    flex: 1; /* This will make the main content area take up remaining space */
+  height: calc(100vh - 2rem - 3rem); /* Subtract header and footer height */
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
 .custom-header {
     background-color: rgb(90, 207, 228);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure it's above other content */
 }
 
 #signupButton {
@@ -26,14 +23,58 @@ main {
     background-color: rgb(61, 92, 150);
 }
 
-.scrollspy-example {
-    /* Make the container scrollable */
-    overflow-y: auto;
-    max-height: 70vh; /* Adjust as needed */
-  }
+.chatbox {
+    padding-bottom: 60px; /* Adjust according to the height of the input area */
+    overflow-y: auto; /* Enable vertical scrolling for chatbox */
+}
+
+.chat-bubble {
+display: inline-block;
+max-width: 80%;
+margin-bottom: 10px;
+padding: 10px 15px;
+border-radius: 20px;
+clear: both;
+}
+
+.user-bubble {
+background-color: rgb(77, 140, 191);
+float: right;
+}
+
+.bot-bubble {
+background-color: rgb(61, 92, 150);
+float: left;
+}
+
+.loading-dots {
+    animation: dot-blink 1.5s infinite;
+    display: inline-block;
+    max-width: 80%;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border-radius: 20px;
+}
+
+@keyframes dot-blink {
+    0%, 20% {
+        color: transparent;
+    }
+    40% {
+        color: #ada9a9; /* Change to your preferred color */
+    }
+    60% {
+        color: transparent;
+    }
+    80%, 100% {
+        color: #ffffff; /* Change to your preferred color */
+    }
+}
+
   
-  .scrollspy-example > *:last-child {
-    /* Align the last child at the top of the container */
-    margin-bottom: auto;
+/* Ensure the footer remains fixed at the bottom */
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
   }
-  

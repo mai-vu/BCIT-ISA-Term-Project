@@ -35,28 +35,72 @@ async function updateUsageCount() {
 // Call the function to update the usage count initially
 updateUsageCount();
 
-document.getElementById('submitButton').addEventListener('click', function() {
-    let text = document.getElementById('userInput').value;
-    let data = { text: text };
+function adjustMainContentHeight() {
+  const headerHeight = document.querySelector('header').offsetHeight;
+  const footerHeight = document.querySelector('footer').offsetHeight;
+  document.getElementById('main-content').style.height = `calc(100vh - ${headerHeight}px - ${footerHeight}px)`;
+}
 
-    fetch(apiUrl, {
+// Call the function initially and on window resize
+window.addEventListener('resize', adjustMainContentHeight);
+adjustMainContentHeight();
+
+document.getElementById('submitButton').addEventListener('click', function() {
+  // Get the user input
+  let text = document.getElementById('userInput').value;
+
+  // Clear the text input box
+  document.getElementById('userInput').value = '';
+
+  // Create a new chat bubble for the user input
+  let userBubble = document.createElement('div');
+  userBubble.classList.add('chat-bubble', 'user-bubble');
+  userBubble.textContent = text;
+
+  // Append the user bubble to the chatbox
+  document.getElementById('chatbox').appendChild(userBubble);
+
+  // Scroll to the bottom of the chatbox after sending the message
+  document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
+
+  // Show loading indicator while waiting for the response
+  let loadingBubble = document.createElement('div');
+  loadingBubble.classList.add('chat-bubble', 'bot-bubble');
+  loadingBubble.innerHTML = '<span class="loading-dots">.</span><span class="loading-dots">.</span><span class="loading-dots">.</span>';
+
+  // Append the loading bubble to the chatbox
+  document.getElementById('chatbox').appendChild(loadingBubble);
+
+  // Data to be sent to the server
+  let data = { text: text };
+
+  // Send the user input to the server
+  fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+          'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Response:", data);
-        let query = document.createElement('h5');
-        query.textContent = '"' + text + '"';
-        document.getElementById('chatbox').appendChild(query);
-        let response = document.createElement('p');
-        response.textContent = data.prediction;
-        document.getElementById('chatbox').appendChild(response);
-    })
-    .catch(error => {
+  })
+  .then(response => response.json())
+  .then(data => {
+      // Remove the loading indicator
+      document.getElementById('chatbox').removeChild(loadingBubble);
+
+      // Create a new chat bubble for the chatbot response
+      let botBubble = document.createElement('div');
+      botBubble.classList.add('chat-bubble', 'bot-bubble');
+      botBubble.textContent = data.prediction;
+
+      // Append the chatbot bubble to the chatbox
+      document.getElementById('chatbox').appendChild(botBubble);
+
+      // Scroll to the bottom of the chatbox after receiving and displaying the response
+      document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
+  })
+  .catch(error => {
+      // Remove the loading indicator on error
+      document.getElementById('chatbox').removeChild(loadingBubble);
       console.error('Error:', error);
-    });
   });
+});
