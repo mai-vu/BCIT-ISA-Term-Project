@@ -86,8 +86,6 @@ app.get('/users/usagecount', async (req, res) => {
     try {
         const email = req.session.email;
 
-        console.log('Email:', email);
-
         // Connect to the database
         const usersCollection = await connectToDatabase();
 
