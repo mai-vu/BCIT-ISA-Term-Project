@@ -1,4 +1,5 @@
 export const messages = {
+    // Universal
     title: "Chatbot",
     header: "ChatAMAT",
     submitButton: "Submit",
@@ -12,7 +13,13 @@ export const messages = {
     welcome: "Welcome to ChatAMAT!",
     getStarted: "Log in or sign up to get started.",
     usageCount: "Usage Count: ", 
+
+    // Home
     home: "Chatbot Home",
+
+    // Admin Dashboard
     adminTitle: "Admin Dashboard",
+    tableHeaderEmail: "Email",
+    tableHeaderUsageCount: "Usage Count",
 
 };
