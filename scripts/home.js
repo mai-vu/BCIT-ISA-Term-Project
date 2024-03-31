@@ -9,6 +9,7 @@ function replaceElementContents() {
   document.getElementById('title').textContent = messages.home;
   document.getElementById('usageCount').innerText = messages.usageCount
   document.getElementById('logoutButton').textContent = messages.logout;
+  document.getElementById('submitButton').textContent = messages.submitButton;
 }
 
 // Call the function when the DOM content is loaded
@@ -151,3 +152,12 @@ function filterResponse(responseText) {
   return filteredResponse;
 }
 
+// disable the submit button if the input field is empty
+document.getElementById('userInput').addEventListener('input', function () {
+  let submitButton = document.getElementById('submitButton');
+  if (this.value.trim() === '') {
+    submitButton.disabled = true;
+  } else {
+    submitButton.disabled = false;
+  }
+});
