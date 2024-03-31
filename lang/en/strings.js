@@ -13,5 +13,6 @@ export const messages = {
     getStarted: "Log in or sign up to get started.",
     usageCount: "Usage Count: ", 
     home: "Chatbot Home",
+    adminTitle: "Admin Dashboard",
 
 };
