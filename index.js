@@ -221,6 +221,12 @@ app.post('/signup', async (req, res) => {
         // Store email in session
         req.session.email = email;
 
+        //get user uid and assign to session
+        const newUser = await usersCollection.findOne({ email });
+        req.session.uid = newUser._id.toString();
+
+        console.log('User created:', email);
+
         // Generate a JWT token for the user
         const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
 
@@ -228,7 +234,7 @@ app.post('/signup', async (req, res) => {
         res.cookie('token', token, { httpOnly: true });
 
         // Redirect based on user's role
-        if (existingUser.role === 'admin') {
+        if (newUser.role === 'admin') {
             res.redirect('/admin');
         } else {
             res.redirect('/home');
