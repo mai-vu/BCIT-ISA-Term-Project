@@ -27,21 +27,25 @@
     <div class="container col-xl-10 col-xxl-8 px-4 py-2" style="padding-bottom: 20%">
         <div class="row align-items-center g-lg-5 py-5">
             <div class="col-md-10 mx-auto col-lg-5">
-                <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action='/login' method='post'>
+                <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action='/login' method='post' id="loginForm">
                     <div class="form-floating mb-3">
-                        <input name='email' type="email" class="form-control ostrichFontBlack" id="floatingInput"
+                        <input name='email' type="email" class="form-control ostrichFontBlack" id="emailInput"
                             placeholder="name@example.com" required>
-                        <label for="floatingInput" id="emailLabel"></label>
+                        <label for="emailInput" id="emailLabel"></label>
                     </div>
                     <div class="form-floating mb-3">
                         <input name='password' type="password" class="form-control ostrichFontBlack"
                             id="floatingPassword" placeholder="Password" required>
                         <label for="floatingPassword" id="passwordLabel"></label>
                     </div>
-                    <button class="w-100 btn btn-lg btn-primary ostrichFontBlack" type="submit" id="loginButton"></button>
                     <div class="text-center mt-3">
-                        <a href="/password/forgot-password" class="text-body-secondary small-link" style="color: blue;"
-                            id="forgotPasswordLink"></a>
+                        <button class="w-100 btn btn-lg btn-primary ostrichFontBlack" type="submit"
+                            id="loginButton"></button>
+                        <p class="mt-3" id="noAccountSignUp"></p>
+                        <a href="/signup" id="signupButton" class="w-100 btn btn-lg btn-primary ostrichFontBlack"></a>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a class="text-body-secondary small-link" style="color: blue;" id="forgotPasswordLink"></a>
                     </div>
                 </form>
             </div>
