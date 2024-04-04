@@ -6,6 +6,7 @@ import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import passwordRouter from './routes/passwordRouter.js'; 
 
 dotenv.config();
 const mongoURI = process.env.DB_URL;
@@ -36,6 +37,10 @@ async function connectToDatabase() {
     await client.connect();
     return client.db(db).collection('users');
 }
+
+
+// Use the Password-related Route Handler
+app.use('/password', passwordRouter);
 
 // Index page, gatekeeps if user is logged in
 app.get('/', (req, res) => {

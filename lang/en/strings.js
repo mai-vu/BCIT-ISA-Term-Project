@@ -14,6 +14,8 @@ export const messages = {
     forgotPassword: "Forgot your Password?",
     welcome: "Welcome to ChatAMAT!",
     getStarted: "Log in or sign up to get started.",
+    noAccountSignUp: "Don't have an account? Sign up here.",
+    goLogIn: "Already have an account? Log in here.",
 
     // Home
     home: "Chatbot Home",
@@ -23,5 +25,10 @@ export const messages = {
     adminTitle: "Admin Dashboard",
     tableHeaderEmail: "Email",
     tableHeaderUsageCount: "Usage Count",
+
+    // Forgot Password
+    forgotPasswordText: "Password reset link has been sent to: ",
+    emailNotFound: "Account does not exist. Is this the correct email? ",
+    newPassword: "New Password",
 
 };
