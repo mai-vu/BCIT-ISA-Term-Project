@@ -27,6 +27,7 @@ export const messages = {
     tableHeaderUsageCount: "Usage Count",
 
     // Forgot Password
+    noEmail: "No email provided. Please enter your email to reset password.",
     forgotPasswordText: "Password reset link has been sent to: ",
     emailNotFound: "Account does not exist. Is this the correct email? ",
     newPassword: "New Password",

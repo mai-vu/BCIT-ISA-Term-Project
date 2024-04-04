@@ -12,6 +12,10 @@ document.getElementById("noAccountSignUp").textContent = messages.noAccountSignU
 document.getElementById("forgotPasswordLink").addEventListener("click", function() {
     //if email is not empty, redirect to forgotPassword.html
     const email = document.getElementById("emailInput").value;
-    const url = '/password/forgot-password?email=' + encodeURIComponent(email); // Construct the URL with email parameter
-    window.location.href = url; 
+    if (email !== "") {
+        const url = '/password/forgot-password?email=' + encodeURIComponent(email); // Construct the URL with email parameter
+        window.location.href = url; 
+    } else {
+        alert(messages.noEmail);
+    }
 });
