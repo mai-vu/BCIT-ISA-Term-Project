@@ -91,6 +91,10 @@ document.getElementById('submitButton').addEventListener('click', function () {
       // Process the response and filter repetitive text
       let filteredResponse = filterResponse(data.prediction);
 
+      if (!filteredResponse) {
+        filteredResponse = "I'm sorry, I didn't understand that. Can you please rephrase?";
+      }
+
       // Check if the filtered response is not empty
       if (filteredResponse) {
         // Create a new chat bubble for the chatbot response
@@ -114,7 +118,6 @@ document.getElementById('submitButton').addEventListener('click', function () {
 
 // Function to filter the response and remove repetitive text
 function filterResponse(responseText) {
-  console.log(responseText);
 
   // Split the response into sentences, discarding text before "[SEP]"
   let sentences = responseText.split('[SEP]').slice(1).join('[SEP]');
