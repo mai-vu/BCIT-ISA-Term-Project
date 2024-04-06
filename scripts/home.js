@@ -3,6 +3,7 @@ import { messages } from '../lang/en/strings.js';
 
 const apiUrl = "https://www.alexkong.xyz/proj/predict";
 
+let apiKey = null;
 async function getApiKey() {
   try {
     const response = await fetch('users/apiKey');
@@ -14,7 +15,9 @@ async function getApiKey() {
   } 
 }
 
-const apiKey = await getApiKey();
+getApiKey().then((key) => {
+  apiKey = key;
+});
 
 
 // Function to replace element contents with strings from messages object
