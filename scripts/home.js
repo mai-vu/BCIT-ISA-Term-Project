@@ -3,6 +3,20 @@ import { messages } from '../lang/en/strings.js';
 
 const apiUrl = "https://www.alexkong.xyz/proj/predict";
 
+async function getApiKey() {
+  try {
+    const response = await fetch('users/apiKey');
+    const data = await response.json();
+    return data.apiKey;
+  } catch (error) {
+    console.error('Error fetching API key:', error);
+    return null;
+  } 
+}
+
+const apiKey = await getApiKey();
+
+
 // Function to replace element contents with strings from messages object
 function replaceElementContents() {
   // Replace title
@@ -79,7 +93,8 @@ document.getElementById('submitButton').addEventListener('click', function () {
   fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey
       },
       body: JSON.stringify(data)
     })

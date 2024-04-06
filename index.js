@@ -155,6 +155,11 @@ app.get('/users/role', async (req, res) => {
     }
 });
 
+app.get('/users/apikey', async (req, res) => {
+    const apiKey = req.session.apiKey;
+    res.json({ apiKey });
+});
+
 // Login Route
 app.post('/login', async (req, res) => {
     try {
@@ -183,6 +188,7 @@ app.post('/login', async (req, res) => {
 
         //get user uid and assign to session
         req.session.uid = existingUser._id.toString();
+        req.session.apiKey = existingUser.apiKey;
 
         // Generate a JWT token for the user
         const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
