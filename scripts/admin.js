@@ -13,6 +13,7 @@ function replaceElementContents() {
     document.getElementById('tableHeaderEndpoint').textContent = messages.tableHeaderEndpoint;
     document.getElementById('tableHeaderRequests').textContent = messages.tableHeaderRequests;
     document.getElementById('tableHeaderEmail').textContent = messages.tableHeaderEmail;
+    document.getElementById('tableHeaderApiKey').textContent = messages.tableHeaderApiKey;
     document.getElementById('tableHeaderUsageCount').textContent = messages.tableHeaderUsageCount;
 }
 
@@ -20,6 +21,18 @@ function replaceElementContents() {
 document.addEventListener('DOMContentLoaded', () => {
     replaceElementContents();
 });
+
+// Function to fetch API usage data
+async function fetchApiUsageData() {
+    try {
+        const response = await fetch('/admin/api-usage');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching API usage data:', error);
+        return [];
+    }
+}
 
 // Function to fetch users data
 async function fetchUsersData() {
@@ -48,12 +61,16 @@ async function populateUserTable() {
         const row = `
             <tr>
                 <td>${user.email}</td>
-                <td>${user.API_calls}</td>
+                <td>${user['api-key']}</td>
+                <td>${user.role}</td>
             </tr>
         `;
         usersList.innerHTML += row;
     });
 }
+
+// Call populateUserTable() when the page loads
+window.onload = populateUserTable;
 
 
 // Call populateUserTable() when the page loads
