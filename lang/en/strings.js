@@ -27,6 +27,9 @@ export const messages = {
     adminTitle: "Admin Dashboard",
     tableHeaderEmail: "Email",
     tableHeaderUsageCount: "Usage Count",
+    tableHeaderMethod: "Method",
+    tableHeaderEndpoint: "Endpoint",
+    tableHeaderRequests: "Requests",
 
     // Forgot Password
     noEmail: "No email provided. Please enter your email to reset password.",

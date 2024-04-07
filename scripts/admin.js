@@ -6,12 +6,13 @@ const dbUrl = "mongodb+srv://isa:nsk1BTC6XDC2AFfe@isa.aobezkp.mongodb.net/?retry
 
 // Function to replace element contents with strings from messages object
 function replaceElementContents() {
-  // Replace title
-  document.getElementById('title').textContent = messages.adminTitle;
-  // Don't need usagecount for admin page
-  // document.getElementById('usageCount').innerText = messages.usageCount
-  document.getElementById('logoutButton').textContent = messages.logout;
-  document.getElementById('tableHeaderEmail').textContent = messages.tableHeaderEmail;
+    // Replace title
+    document.getElementById('title').textContent = messages.adminTitle;
+    document.getElementById('logoutButton').textContent = messages.logout;
+    document.getElementById('tableHeaderMethod').textContent = messages.tableHeaderMethod;
+    document.getElementById('tableHeaderEndpoint').textContent = messages.tableHeaderEndpoint;
+    document.getElementById('tableHeaderRequests').textContent = messages.tableHeaderRequests;
+    document.getElementById('tableHeaderEmail').textContent = messages.tableHeaderEmail;
     document.getElementById('tableHeaderUsageCount').textContent = messages.tableHeaderUsageCount;
 }
 
@@ -19,8 +20,6 @@ function replaceElementContents() {
 document.addEventListener('DOMContentLoaded', () => {
     replaceElementContents();
 });
-
-// admin.js
 
 // Function to fetch users data
 async function fetchUsersData() {
