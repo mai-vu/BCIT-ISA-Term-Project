@@ -32,7 +32,29 @@ function adjustMainContentHeight() {
 window.addEventListener('resize', adjustMainContentHeight);
 adjustMainContentHeight();
 
+async function getUsageCount() {
+  try {
+    const response = await fetch(apiKeyUrlConsumption, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey
+      },
+    });
 
+    if (response.status === 200) {
+      const data = await response.json();
+      console.log('Usage count:', data);
+      if (data && data.usage) {
+        console.log('Usage count:', data.usage);
+        document.getElementById('usageCount').textContent = messages.usageCount + data.usage;
+      }
+    }
+  } catch (error) {
+    console.error('Error getting usage count:', error);
+  }
+}
+getUsageCount();
 
 // Function to check conversation existence and display conversation
 async function checkConversationAndDisplay() {
@@ -158,7 +180,7 @@ function handleSubmit() {
     .catch(error => {
       // Remove the loading indicator on error
       // document.getElementById('chatbox').removeChild(loadingBubble);
-      console.error('Error:', error);
+      displayMessage("I'm sorry, there was an error processing your request. Please try again later.", false);
     });
 }
 
