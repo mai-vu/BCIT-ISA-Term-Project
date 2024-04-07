@@ -172,6 +172,58 @@ app.get('/users/apikey', async (req, res) => {
     }
 });
 
+app.get('/users/convoExisted', async (req, res) => {
+    try {
+        const email = req.session.email;
+
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const convoExisted = user.convoExisted;
+
+        res.json({ convoExisted }); // Send the user's convoExisted boolean as JSON response
+    } catch (error) {
+        console.error('Error fetching API calls count:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.put('/users/convoExisted', async (req, res) => {
+    try {
+        const email = req.session.email;
+
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const convoExisted = req.body.convoExisted;
+
+        // Update the user's convoExisted boolean
+        await usersCollection.updateOne({ email }, { $set: { convoExisted: req.body.convoExisted } });
+
+        res.json({ convoExisted }); // Send success response
+    } catch (error) {
+        console.error('Error updating conversation existence:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+);
+
 // Login Route
 app.post('/login', async (req, res) => {
     try {
@@ -241,7 +293,7 @@ app.post('/signup', async (req, res) => {
         const apiKey = await createAPIKey();
 
         // Insert the new user into the database with hashed password
-        await usersCollection.insertOne({ email, password: hashedPassword, role: 'user', 'api-key': apiKey});
+        await usersCollection.insertOne({ email: email, password: hashedPassword, role: 'user', 'api-key': apiKey, convoExisted: false});
 
         // Store email in session
         req.session.email = email;

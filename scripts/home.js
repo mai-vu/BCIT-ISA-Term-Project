@@ -7,7 +7,7 @@ const apiUrlConvo = "https://www.alexkong.xyz/proj/convo";
 // const apiUrlConvo = "http://localhost:3000/proj/convo";
 
 
-let convoExisted = false; // Initialize a boolean variable to track conversation existence
+// let convoExisted = false; // Initialize a boolean variable to track conversation existence
 
 // Function to replace element contents with strings from messages object
 function replaceElementContents() {
@@ -16,6 +16,7 @@ function replaceElementContents() {
   document.getElementById('usageCount').innerText = messages.usageCount
   document.getElementById('logoutButton').textContent = messages.logout;
   document.getElementById('submitButton').textContent = messages.submitButton;
+  document.getElementById('deleteButton').textContent = messages.deleteButton;
 }
 
 // Call the function when the DOM content is loaded
@@ -31,6 +32,26 @@ function adjustMainContentHeight() {
 // Call the function initially and on window resize
 window.addEventListener('resize', adjustMainContentHeight);
 adjustMainContentHeight();
+
+// Function to display a chat bubble for the message
+function displayMessage(text, byUser) {
+  let bubble = document.createElement('div');
+  bubble.classList.add('chat-bubble');
+
+  if (byUser) {
+    bubble.classList.add('user-bubble');
+  } else  {
+    bubble.classList.add('bot-bubble');
+  }
+
+  bubble.textContent = text;
+
+  // Append the chat bubble to the chatbox
+  document.getElementById('chatbox').appendChild(bubble);
+
+  // Scroll to the bottom of the chatbox after displaying the message
+  document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
+}
 
 
 //get api key
@@ -77,6 +98,53 @@ async function getUsageCount() {
 }
 getUsageCount();
 
+
+async function getConvoExisted() {
+  try {
+    const response = await fetch('/users/convoExisted', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) {
+      const data = await response.json();
+
+      return data.convoExisted;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+let convoExisted = await getConvoExisted();
+
+
+async function updateConvoExisted(convoExisted) {
+  try {
+    const response = await fetch('/users/convoExisted', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ convoExisted }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.convoExisted;
+    } else {
+      // Handle non-200 response status
+      const errorMessage = await response.text();
+      throw new Error(`Failed to update conversation existence: ${errorMessage}`);
+    }
+  } catch (error) {
+    // Handle fetch or other errors
+    console.error('Error updating conversation existence:', error);
+    throw error; // Rethrow the error for the caller to handle
+  }
+}
+
 // Function to check conversation existence and display conversation
 async function checkConversationAndDisplay() {
   try {
@@ -111,28 +179,11 @@ async function checkConversationAndDisplay() {
   }
 }
 
-// Function to display a chat bubble for the message
-function displayMessage(text, byUser) {
-  let bubble = document.createElement('div');
-  bubble.classList.add('chat-bubble');
-
-  if (byUser) {
-    bubble.classList.add('user-bubble');
-  } else  {
-    bubble.classList.add('bot-bubble');
-  }
-
-  bubble.textContent = text;
-
-  // Append the chat bubble to the chatbox
-  document.getElementById('chatbox').appendChild(bubble);
-
-  // Scroll to the bottom of the chatbox after displaying the message
-  document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
+// Call the function to check conversation existence and display conversation on page load
+if (convoExisted) {
+  checkConversationAndDisplay();
 }
 
-// Call the function to check conversation existence and display conversation on page load
-checkConversationAndDisplay();
 
 // Function to handle form submission
 async function handleSubmit() {
@@ -182,7 +233,10 @@ async function handleSubmit() {
     if (!response.ok) {
       throw new Error(responseData.message || 'Failed to get response');
     } else {
-      convoExisted = true; // Set convoExisted to true after the first interaction
+      if (!convoExisted) {
+        convoExisted = await updateConvoExisted(true);
+        console.log('Conversation existed:', convoExisted);
+      }
     }
 
     // Remove the loading indicator
@@ -219,6 +273,35 @@ async function handleSubmit() {
 document.getElementById('submitButton').addEventListener('click', function () {
   handleSubmit();
 });
+
+//add event listener to delete button
+document.getElementById('deleteButton').addEventListener('click', async function () {
+  try {
+    // Send a DELETE request to delete the conversation
+    const response = await fetch(apiUrlConvo, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey
+      },
+    });
+
+    if (response.ok) {
+      // Update the conversation existence status
+      convoExisted = await updateConvoExisted(false);
+      console.log('Conversation existed:', convoExisted);
+      // Clear the chatbox
+      document.getElementById('chatbox').innerHTML = '';
+    } else {
+      // Handle non-200 response status
+      const errorMessage = await response.text();
+      throw new Error(`Failed to delete conversation: ${errorMessage}`);
+    }
+  } catch (error) {
+    console.error('Error deleting conversation:', error);
+  }
+});
+
 
 function filterResponse(responseText) {
   try {

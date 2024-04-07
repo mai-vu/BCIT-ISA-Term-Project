@@ -20,6 +20,7 @@ export const messages = {
     // Home
     home: "Chatbot Home",
     submitButton: "Submit",
+    deleteButton: "Delete Conversation",
 
     // Admin Dashboard
     adminTitle: "Admin Dashboard",
