@@ -46,6 +46,18 @@ async function fetchUsersData() {
     }
 }
 
+// Function to calculate total usage for each endpoint
+async function fetchEndpointUsage() {
+    try {
+        const response = await fetch('/admin/endpoint-usage');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching endpoint usage data:', error);
+        return [];
+    }
+}
+
 async function calculateTotalUsage() {
     const apiUsageData = await fetchApiUsageData();
     const totalUsage = {};
@@ -55,7 +67,6 @@ async function calculateTotalUsage() {
         totalUsage[apiKey] = totalUsage[apiKey] ? totalUsage[apiKey] + usage : usage;
     });
 
-    console.log(totalUsage); // Log the totalUsage object
     return totalUsage;
 }
 
@@ -85,9 +96,31 @@ async function populateUserTable() {
     });
 }
 
-// Call populateUserTable() when the page loads
-window.onload = populateUserTable;
+async function populateEndpointTable() {
+    const endpointList = document.querySelector('#endpointTable tbody');
 
+    // Fetch endpoint usage data from the server
+    const endpointData = await fetchEndpointUsage();
+    console.log('endpoint data', endpointData);
 
-// Call populateUserTable() when the page loads
-window.onload = populateUserTable;
+    // Clear existing table rows
+    endpointList.innerHTML = '';
+
+    // Iterate over each endpoint and create table rows
+    endpointData.forEach(endpoint => {
+        const row = `
+            <tr>
+                <td>${endpoint.method}</td>
+                <td>${endpoint.endpoint}</td>
+                <td>${endpoint.count}</td>
+            </tr>
+        `;
+        endpointList.innerHTML += row;
+    });
+}
+
+// Call populateUserTable() and populateEndpointTable() when the page loads
+window.onload = function() {
+    populateUserTable();
+    populateEndpointTable();
+};

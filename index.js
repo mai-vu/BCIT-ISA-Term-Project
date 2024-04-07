@@ -45,6 +45,14 @@ async function connectToDatabaseForUsage() {
     return client.db(db).collection('usage');
 }
 
+// Function to connect to MongoDB for endpoint stats
+async function connectToDatabaseForStats() {
+    const client = new MongoClient(mongoURI);
+    await client.connect();
+    return client.db(db).collection('stats');
+
+}
+
 async function createAPIKey() {
     try {
         const response = await fetch('https://www.alexkong.xyz/proj/api-key', {
@@ -157,6 +165,22 @@ app.get('/admin/api-usage', async (req, res) => {
     }
 });
 
+// Fetch usage data for each endpoint
+app.get('/admin/endpoint-usage', async (req, res) => {
+    try {
+        // Connect to the database
+        const statsCollection = await connectToDatabaseForStats();
+
+        // Fetch endpoint usage data
+        const endpointUsageData = await statsCollection.find().toArray();
+
+        // Send the endpoint usage data as JSON response
+        res.json(endpointUsageData);
+    } catch (error) {
+        console.error('Error fetching endpoint usage data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 app.get('/users/role', async (req, res) => {
     try {
