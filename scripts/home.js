@@ -157,19 +157,23 @@ async function checkConversationAndDisplay() {
     });
 
     if (response.status === 404 || response.status === 401) {
-      convoExisted = false; // Set convoExisted to false if conversation does not exist
+      if (convoExisted) {
+        convoExisted = await updateConvoExisted(false); // Set convoExisted to false if conversation does not exist
+      }
       console.log('Conversation does not exist');
       return [];
     } else if (response.status === 200) {
-      convoExisted = true; // Set convoExisted to true if conversation exists
       const data = await response.json(); // Return the conversation messages
       if (data && data.convoMessage) {
+        if (!convoExisted) {
+          convoExisted = await updateConvoExisted(true); // Set convoExisted to true if conversation exists
+        }
         // Display conversation messages
         data.convoMessage.forEach(message => {
           let text = message.text;
           if (!message.byUser) {
             text = filterResponse(text);
-          }
+          } 
           displayMessage(text, message.byUser); // Assuming message object has 'text' and 'sender' properties
         });
       }
