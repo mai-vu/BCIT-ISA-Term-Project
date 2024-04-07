@@ -7,8 +7,6 @@ const apiUrlConvo = "https://www.alexkong.xyz/proj/convo";
 // const apiUrlConvo = "http://localhost:3000/proj/convo";
 
 
-// let convoExisted = false; // Initialize a boolean variable to track conversation existence
-
 // Function to replace element contents with strings from messages object
 function replaceElementContents() {
   // Replace title
@@ -183,10 +181,43 @@ async function checkConversationAndDisplay() {
   }
 }
 
-// Call the function to check conversation existence and display conversation on page load
+// Call the function to check conversation existence and display messages
 if (convoExisted) {
   checkConversationAndDisplay();
+  document.getElementById('deleteButton').disabled = false; // Enable the delete button
 }
+
+// Add event listener to delete button
+document.getElementById('deleteButton').addEventListener('click', async function () {
+  try {
+    if (convoExisted) {
+      // Send a DELETE request to delete the conversation
+      const response = await fetch(apiUrlConvo, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+      });
+
+      if (response.ok) {
+        // Update the conversation existence status
+        convoExisted = await updateConvoExisted(false);
+        console.log('Conversation existed:', convoExisted);
+        // Clear the chatbox
+        document.getElementById('chatbox').innerHTML = '';
+        document.getElementById('deleteButton').disabled = true; // Disable the delete button
+      } else {
+        // Handle non-200 response status
+        const errorMessage = await response.text();
+        throw new Error(`Failed to delete conversation: ${errorMessage}`);
+      }
+    }
+  } catch (error) {
+    console.error('Error deleting conversation:', error);
+  }
+});
+
 
 
 // Function to handle form submission
@@ -239,6 +270,7 @@ async function handleSubmit() {
     } else {
       if (!convoExisted) {
         convoExisted = await updateConvoExisted(true);
+        document.getElementById('deleteButton').disabled = false; // Enable the delete button
         console.log('Conversation existed:', convoExisted);
       }
     }
@@ -277,35 +309,6 @@ async function handleSubmit() {
 document.getElementById('submitButton').addEventListener('click', function () {
   handleSubmit();
 });
-
-//add event listener to delete button
-document.getElementById('deleteButton').addEventListener('click', async function () {
-  try {
-    // Send a DELETE request to delete the conversation
-    const response = await fetch(apiUrlConvo, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey
-      },
-    });
-
-    if (response.ok) {
-      // Update the conversation existence status
-      convoExisted = await updateConvoExisted(false);
-      console.log('Conversation existed:', convoExisted);
-      // Clear the chatbox
-      document.getElementById('chatbox').innerHTML = '';
-    } else {
-      // Handle non-200 response status
-      const errorMessage = await response.text();
-      throw new Error(`Failed to delete conversation: ${errorMessage}`);
-    }
-  } catch (error) {
-    console.error('Error deleting conversation:', error);
-  }
-});
-
 
 function filterResponse(responseText) {
   try {
