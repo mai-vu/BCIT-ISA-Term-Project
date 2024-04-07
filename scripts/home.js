@@ -72,6 +72,25 @@ async function getApiKey() {
 }
 const apiKey = await getApiKey();
 
+async function getUserRole() {
+  try {
+    const response = await fetch('/users/role', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) {
+      const data = await response.json();
+      return data.role;
+    }
+  } catch (error) {
+    console.error('Error getting user role:', error);
+  }
+}
+const userRole = await getUserRole();
+
 async function getUsageCount() {
   try {
     const response = await fetch(apiKeyUrlConsumption, {
@@ -85,9 +104,17 @@ async function getUsageCount() {
     if (response.status === 200) {
       const data = await response.json();
       console.log('Usage count:', data);
-      if (data && data.usage) {
-        console.log('Usage count:', data.usage);
+      if (data && userRole === 'user') {
         document.getElementById('usageCount').textContent = messages.usageCount + data.usage;
+      } else if (data && data.stats && userRole === 'admin') {
+        // Iterate through the stats array and display count for the admin
+        data.stats.forEach(stat => {
+          if (stat['api-key'] === apiKey) {
+            document.getElementById('usageCount').textContent = messages.usageCount + stat.usage;
+          } else {
+            console.log('API Key not matched:');
+          }
+        });
       }
     }
   } catch (error) {
@@ -95,6 +122,7 @@ async function getUsageCount() {
   }
 }
 getUsageCount();
+
 
 
 async function getConvoExisted() {
