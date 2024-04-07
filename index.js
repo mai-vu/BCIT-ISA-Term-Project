@@ -20,7 +20,7 @@ const SESSION_KEY = process.env.SESSION_KEY;
 
 app.use(session({
     secret: SESSION_KEY,
-    resave: false,
+    resave: true,
     saveUninitialized: true
 }));
 app.use(cookieParser());
