@@ -105,32 +105,6 @@ app.get('/admin/users', async (req, res) => {
     }
 });
 
-
-app.get('/users/usagecount', async (req, res) => {
-    try {
-        const email = req.session.email;
-
-        // Connect to the database
-        const usersCollection = await connectToDatabase();
-
-        // Find the user by email
-        const user = await usersCollection.findOne({ email });
-
-        if (!user) {
-            res.status(404).json({ error: 'User not found' });
-            return;
-        }
-
-        // Retrieve the API_calls count for the user
-        const apiCalls = user.API_calls || 0;
-
-        res.json({ apiCalls }); // Send the API_calls count as JSON response
-    } catch (error) {
-        console.error('Error fetching API calls count:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 app.get('/users/role', async (req, res) => {
     try {
         const email = req.session.email;
@@ -227,7 +201,7 @@ app.post('/signup', async (req, res) => {
         }
 
         // Insert the new user into the database with hashed password
-        await usersCollection.insertOne({ email, password: hashedPassword, API_calls: 0, role: 'user'});
+        await usersCollection.insertOne({ email, password: hashedPassword, role: 'user'});
 
         // Store email in session
         req.session.email = email;
