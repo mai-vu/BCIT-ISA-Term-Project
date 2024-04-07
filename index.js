@@ -38,6 +38,25 @@ async function connectToDatabase() {
     return client.db(db).collection('users');
 }
 
+async function createAPIKey() {
+    try {
+        const response = await fetch('https://www.alexkong.xyz/proj/api-key', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to get API key');
+        }
+        const data = await response.json();
+        const apiKey = data['api-key'];
+        return apiKey; // Return the API key
+    } catch (error) {
+        console.error('Error:', error);
+        throw error; // Re-throw the error for handling elsewhere if needed
+    }
+}
 
 // Use the Password-related Route Handler
 app.use('/password', passwordRouter);
@@ -130,8 +149,27 @@ app.get('/users/role', async (req, res) => {
 });
 
 app.get('/users/apikey', async (req, res) => {
-    const apiKey = req.session.apiKey;
-    res.json({ apiKey });
+    try {
+        const email = req.session.email;
+
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const apiKey = user['api-key'];
+
+        res.json({ apiKey }); // Send the user's role as JSON response
+    } catch (error) {
+        console.error('Error fetching API calls count:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // Login Route
@@ -200,8 +238,10 @@ app.post('/signup', async (req, res) => {
             return;
         }
 
+        const apiKey = await createAPIKey();
+
         // Insert the new user into the database with hashed password
-        await usersCollection.insertOne({ email, password: hashedPassword, role: 'user'});
+        await usersCollection.insertOne({ email, password: hashedPassword, role: 'user', 'api-key': apiKey});
 
         // Store email in session
         req.session.email = email;

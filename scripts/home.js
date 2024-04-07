@@ -6,8 +6,8 @@ const apiKeyUrlConsumption = "https://www.alexkong.xyz/proj/api/consumption";
 const apiUrlConvo = "https://www.alexkong.xyz/proj/convo";
 // const apiUrlConvo = "http://localhost:3000/proj/convo";
 
-const apiKey = "1234";
-let convoExisted = true; // Initialize a boolean variable to track conversation existence
+
+let convoExisted = false; // Initialize a boolean variable to track conversation existence
 
 // Function to replace element contents with strings from messages object
 function replaceElementContents() {
@@ -31,6 +31,27 @@ function adjustMainContentHeight() {
 // Call the function initially and on window resize
 window.addEventListener('resize', adjustMainContentHeight);
 adjustMainContentHeight();
+
+
+//get api key
+async function getApiKey() {
+  try {
+    const response = await fetch('/users/apikey', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) {
+      const data = await response.json();
+      return data.apiKey;
+    }
+  } catch (error) {
+    console.error('Error getting API key:', error);
+  }
+}
+const apiKey = await getApiKey();
 
 async function getUsageCount() {
   try {
@@ -114,7 +135,7 @@ function displayMessage(text, byUser) {
 checkConversationAndDisplay();
 
 // Function to handle form submission
-function handleSubmit() {
+async function handleSubmit() {
   //disable the submit button
   document.getElementById('submitButton').disabled = true;
 
@@ -144,44 +165,54 @@ function handleSubmit() {
 
   console.log('HTTP Method:', httpMethod);
 
-  // Send the user input to the server
-  fetch(apiUrlConvo, {
+  console.log("apiKey: ", apiKey);
+  try {
+    // Send the user input to the server
+    const response = await fetch(apiUrlConvo, {
       method: httpMethod,
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey
       },
       body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Remove the loading indicator
-      document.getElementById('chatbox').removeChild(loadingBubble);
-
-      console.log('Response:', data);
-
-      // Process the response and filter repetitive text
-      let filteredResponse = filterResponse(data.messages[1].text);
-
-
-      if (!filteredResponse) {
-        filteredResponse = "I'm sorry, I didn't understand that. Can you please rephrase?";
-      }
-
-      // Check if the filtered response is not empty
-      if (filteredResponse) {
-        // // Create a new chat bubble for the chatbot response
-        displayMessage(filteredResponse, false); // Display the chatbot response
-
-        // enable the submit button
-        document.getElementById('submitButton').disabled = false;
-      }
-    })
-    .catch(error => {
-      // Remove the loading indicator on error
-      // document.getElementById('chatbox').removeChild(loadingBubble);
-      displayMessage("I'm sorry, there was an error processing your request. Please try again later.", false);
     });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(responseData.message || 'Failed to get response');
+    } else {
+      convoExisted = true; // Set convoExisted to true after the first interaction
+    }
+
+    // Remove the loading indicator
+    document.getElementById('chatbox').removeChild(loadingBubble);
+
+    console.log('Response:', responseData);
+
+    // Process the response and filter repetitive text
+    let filteredResponse = filterResponse(responseData.messages[1].text);
+
+    if (!filteredResponse) {
+      filteredResponse = "I'm sorry, I didn't understand that. Can you please rephrase?";
+    }
+
+    // Check if the filtered response is not empty
+    if (filteredResponse) {
+      // // Create a new chat bubble for the chatbot response
+      displayMessage(filteredResponse, false); // Display the chatbot response
+
+      // enable the submit button
+      document.getElementById('submitButton').disabled = false;
+
+    }
+  } catch (error) {
+    // Remove the loading indicator on error if it's still present
+    if (loadingBubble) {
+      document.getElementById('chatbox').removeChild(loadingBubble);
+    }
+    displayMessage("I'm sorry, there was an error processing your request. Please try again later.", false);
+  }
 }
 
 // Add event listener to submit button
@@ -189,49 +220,54 @@ document.getElementById('submitButton').addEventListener('click', function () {
   handleSubmit();
 });
 
-
 function filterResponse(responseText) {
-  let sentences = responseText;
+  try {
+    let sentences = responseText;
 
-  // Split the response into sentences, discarding text before "[SEP]"
-  if (responseText.includes('[SEP]')) {
-    sentences = responseText.split('[SEP]').slice(1).join('[SEP]');
-  }
+    // Split the response into sentences, discarding text before "[SEP]"
+    if (responseText.includes('[SEP]')) {
+      sentences = responseText.split('[SEP]').slice(1).join('[SEP]');
+    }
 
-  // Split sentences by ".", ",", "?", and "!"
-  let sentenceArray = sentences.split(/[.,?!]+/);
+    // Split sentences by ".", ",", "?", and "!"
+    let sentenceArray = sentences.split(/[.,?!]+/);
 
-  // Remove empty strings and trim each sentence
-  sentenceArray = sentenceArray.filter(sentence => sentence.trim() !== '');
+    // Remove empty strings and trim each sentence
+    sentenceArray = sentenceArray.filter(sentence => sentence.trim() !== '');
 
-  // Keep track of the punctuation marks for each sentence
-  let punctuationArray = sentences.match(/[.,?!]+/g);
+    // Keep track of the punctuation marks for each sentence
+    let punctuationArray = sentences.match(/[.,?!]+/g);
 
-  // Remove duplicates while keeping track of original punctuation
-  let uniqueSentences = [];
-  let uniqueSentenceSet = new Set(); // Using a set to track unique sentences
-  for (let i = 0; i < sentenceArray.length; i++) {
-    let sentence = sentenceArray[i].trim();
-    let punctuation = punctuationArray ? punctuationArray[i] : ''; // Handle case when punctuationArray is null
-    if (i === sentenceArray.length - 1) {
-      // Check if the last sentence ends with ".", ",", "?", or "!"
-      let lastChar = sentence.charAt(sentence.length - 1);
-      if (!['.', ',', '?', '!'].includes(lastChar)) {
-        continue; // Skip adding this sentence if it doesn't end with punctuation
+    // Remove duplicates while keeping track of original punctuation
+    let uniqueSentences = [];
+    let uniqueSentenceSet = new Set(); // Using a set to track unique sentences
+    for (let i = 0; i < sentenceArray.length; i++) {
+      let sentence = sentenceArray[i].trim();
+      let punctuation = punctuationArray ? punctuationArray[i] : ''; // Handle case when punctuationArray is null
+      if (i === sentenceArray.length - 1) {
+        // Check if the last sentence ends with ".", ",", "?", or "!"
+        let lastChar = sentence.charAt(sentence.length - 1);
+        if (!['.', ',', '?', '!'].includes(lastChar)) {
+          continue; // Skip adding this sentence if it doesn't end with punctuation
+        }
+      }
+      // Add the sentence to the unique set if it's not already there
+      if (!uniqueSentenceSet.has(sentence)) {
+        uniqueSentenceSet.add(sentence);
+        uniqueSentences.push(sentence + punctuation); // Include original punctuation
       }
     }
-    // Add the sentence to the unique set if it's not already there
-    if (!uniqueSentenceSet.has(sentence)) {
-      uniqueSentenceSet.add(sentence);
-      uniqueSentences.push(sentence + punctuation); // Include original punctuation
-    }
+
+    // Rejoin the unique sentences
+    let filteredResponse = uniqueSentences.join(' ');
+
+    return filteredResponse;
+  } catch (error) {
+    console.error('Error in filterResponse:', error);
+    return responseText; // Return the original response text in case of an error
   }
-
-  // Rejoin the unique sentences
-  let filteredResponse = uniqueSentences.join(' ');
-
-  return filteredResponse;
 }
+
 
 // disable the submit button if the input field is empty
 document.getElementById('userInput').addEventListener('input', function () {
