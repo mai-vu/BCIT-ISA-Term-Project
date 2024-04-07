@@ -1,24 +1,13 @@
 // Import the messages object from lang/en/strings.js
 import { messages } from '../lang/en/strings.js';
 
-const apiUrl = "http://localhost:3000/proj/convo";
 
-let apiKey = null;
-async function getApiKey() {
-  try {
-    const response = await fetch('users/apiKey');
-    const data = await response.json();
-    return data.apiKey;
-  } catch (error) {
-    console.error('Error fetching API key:', error);
-    return null;
-  } 
-}
+const apiKeyUrlConsumption = "https://www.alexkong.xyz/proj/api/consumption";
+const apiUrlConvo = "https://www.alexkong.xyz/proj/convo";
+// const apiUrlConvo = "http://localhost:3000/proj/convo";
 
-getApiKey().then((key) => {
-  apiKey = key;
-});
-
+const apiKey = "1234";
+let convoExisted = true; // Initialize a boolean variable to track conversation existence
 
 // Function to replace element contents with strings from messages object
 function replaceElementContents() {
@@ -32,22 +21,6 @@ function replaceElementContents() {
 // Call the function when the DOM content is loaded
 document.addEventListener('DOMContentLoaded', replaceElementContents);
 
-// Function to fetch and update the usage count
-async function updateUsageCount() {
-  try {
-    // Fetch the usage count from the server
-    const response = await fetch('users/usagecount');
-    const data = await response.json();
-
-    // Update the usage count in the span element
-    document.getElementById('usageCount').innerText += data.apiCalls;
-  } catch (error) {
-    console.error('Error updating usage count:', error);
-  }
-}
-
-// Call the function to update the usage count initially
-updateUsageCount();
 
 function adjustMainContentHeight() {
   const headerHeight = document.querySelector('header').offsetHeight;
@@ -59,130 +32,77 @@ function adjustMainContentHeight() {
 window.addEventListener('resize', adjustMainContentHeight);
 adjustMainContentHeight();
 
-// document.getElementById('submitButton').addEventListener('click', function () {
-//   // Get the user input
-//   let text = document.getElementById('userInput').value;
 
-//   // Clear the text input box
-//   document.getElementById('userInput').value = '';
 
-//   // Create a new chat bubble for the user input
-//   let userBubble = document.createElement('div');
-//   userBubble.classList.add('chat-bubble', 'user-bubble');
-//   userBubble.textContent = text;
+// Function to check conversation existence and display conversation
+async function checkConversationAndDisplay() {
+  try {
+    const response = await fetch(apiUrlConvo, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey
+      },
+    });
 
-//   // Append the user bubble to the chatbox
-//   document.getElementById('chatbox').appendChild(userBubble);
-
-//   // Scroll to the bottom of the chatbox after sending the message
-//   document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
-
-//   // Show loading indicator while waiting for the response
-//   let loadingBubble = document.createElement('div');
-//   loadingBubble.classList.add('chat-bubble', 'bot-bubble');
-//   loadingBubble.innerHTML = '<span class="loading-dots">.</span><span class="loading-dots">.</span><span class="loading-dots">.</span>';
-
-//   // Append the loading bubble to the chatbox
-//   document.getElementById('chatbox').appendChild(loadingBubble);
-
-//   // Data to be sent to the server
-//   let data = {
-//     text: text
-//   };
-
-//   // Send the user input to the server
-//   let submitButton = document.getElementById('submitButton');
-//   submitButton.disabled = true; // Disable the submit button while waiting for the response
-//   fetch(apiUrl, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'x-api-key': apiKey
-//       },
-//       body: JSON.stringify(data)
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//       // Remove the loading indicator
-//       document.getElementById('chatbox').removeChild(loadingBubble);
-
-//       // Process the response and filter repetitive text
-//       let filteredResponse = filterResponse(data.prediction);
-
-//       if (!filteredResponse) {
-//         filteredResponse = "I'm sorry, I didn't understand that. Can you please rephrase?";
-//       }
-
-//       // Check if the filtered response is not empty
-//       if (filteredResponse) {
-//         // Create a new chat bubble for the chatbot response
-//         let botBubble = document.createElement('div');
-//         botBubble.classList.add('chat-bubble', 'bot-bubble');
-//         botBubble.textContent = filteredResponse;
-
-//         // Append the chatbot bubble to the chatbox
-//         document.getElementById('chatbox').appendChild(botBubble);
-
-//         // Scroll to the bottom of the chatbox after receiving and displaying the response
-//         document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
-//       }
-//     })
-//     .catch(error => {
-//       // Remove the loading indicator on error
-//       document.getElementById('chatbox').removeChild(loadingBubble);
-//       console.error('Error:', error);
-//     })
-// });
-
-let convoExisted = true; // Initialize a boolean variable to track conversation existence
-
-// Function to check if conversation exists
-function checkConversationExistence() {
-  fetch(apiUrl, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey
-    }
-  })
-  .then(response => {
-    if (response.status === 404) {
+    if (response.status === 404 || response.status === 401) {
       convoExisted = false; // Set convoExisted to false if conversation does not exist
       console.log('Conversation does not exist');
-    }
-    else if (response.status === 200) {
+      return [];
+    } else if (response.status === 200) {
       convoExisted = true; // Set convoExisted to true if conversation exists
-      console.log('Conversation exists');
+      const data = await response.json(); // Return the conversation messages
+      if (data && data.convoMessage) {
+        // Display conversation messages
+        data.convoMessage.forEach(message => {
+          let text = message.text;
+          if (!message.byUser) {
+            text = filterResponse(text);
+          }
+          displayMessage(text, message.byUser); // Assuming message object has 'text' and 'sender' properties
+        });
+      }
     }
-  })
-  .catch(error => {
+  } catch (error) {
     console.error('Error checking conversation existence:', error);
-  });
+  }
 }
 
-// Check conversation existence when the page loads
-window.onload = function() {
-  checkConversationExistence();
-};
+// Function to display a chat bubble for the message
+function displayMessage(text, byUser) {
+  let bubble = document.createElement('div');
+  bubble.classList.add('chat-bubble');
+
+  if (byUser) {
+    bubble.classList.add('user-bubble');
+  } else  {
+    bubble.classList.add('bot-bubble');
+  }
+
+  bubble.textContent = text;
+
+  // Append the chat bubble to the chatbox
+  document.getElementById('chatbox').appendChild(bubble);
+
+  // Scroll to the bottom of the chatbox after displaying the message
+  document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
+}
+
+// Call the function to check conversation existence and display conversation on page load
+checkConversationAndDisplay();
 
 // Function to handle form submission
 function handleSubmit() {
+  //disable the submit button
+  document.getElementById('submitButton').disabled = true;
+
   // Get the user input
   let text = document.getElementById('userInput').value;
 
   // Clear the text input box
   document.getElementById('userInput').value = '';
 
-  // Create a new chat bubble for the user input
-  let userBubble = document.createElement('div');
-  userBubble.classList.add('chat-bubble', 'user-bubble');
-  userBubble.textContent = text;
-
-  // Append the user bubble to the chatbox
-  document.getElementById('chatbox').appendChild(userBubble);
-
-  // Scroll to the bottom of the chatbox after sending the message
-  document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
+  displayMessage(text, true); // Display the user message
 
   // Show loading indicator while waiting for the response
   let loadingBubble = document.createElement('div');
@@ -203,7 +123,7 @@ function handleSubmit() {
   console.log('HTTP Method:', httpMethod);
 
   // Send the user input to the server
-  fetch(apiUrl, {
+  fetch(apiUrlConvo, {
       method: httpMethod,
       headers: {
         'Content-Type': 'application/json',
@@ -216,8 +136,10 @@ function handleSubmit() {
       // Remove the loading indicator
       document.getElementById('chatbox').removeChild(loadingBubble);
 
+      console.log('Response:', data);
+
       // Process the response and filter repetitive text
-      let filteredResponse = filterResponse(data.message.text);
+      let filteredResponse = filterResponse(data.messages[1].text);
 
 
       if (!filteredResponse) {
@@ -226,16 +148,11 @@ function handleSubmit() {
 
       // Check if the filtered response is not empty
       if (filteredResponse) {
-        // Create a new chat bubble for the chatbot response
-        let botBubble = document.createElement('div');
-        botBubble.classList.add('chat-bubble', 'bot-bubble');
-        botBubble.textContent = filteredResponse;
+        // // Create a new chat bubble for the chatbot response
+        displayMessage(filteredResponse, false); // Display the chatbot response
 
-        // Append the chatbot bubble to the chatbox
-        document.getElementById('chatbox').appendChild(botBubble);
-
-        // Scroll to the bottom of the chatbox after receiving and displaying the response
-        document.getElementById('main-content').scrollTop = document.getElementById('main-content').scrollHeight;
+        // enable the submit button
+        document.getElementById('submitButton').disabled = false;
       }
     })
     .catch(error => {
@@ -251,13 +168,13 @@ document.getElementById('submitButton').addEventListener('click', function () {
 });
 
 
-
-
-// Function to filter the response and remove repetitive text
 function filterResponse(responseText) {
+  let sentences = responseText;
 
   // Split the response into sentences, discarding text before "[SEP]"
-  let sentences = responseText.split('[SEP]').slice(1).join('[SEP]');
+  if (responseText.includes('[SEP]')) {
+    sentences = responseText.split('[SEP]').slice(1).join('[SEP]');
+  }
 
   // Split sentences by ".", ",", "?", and "!"
   let sentenceArray = sentences.split(/[.,?!]+/);
@@ -273,7 +190,7 @@ function filterResponse(responseText) {
   let uniqueSentenceSet = new Set(); // Using a set to track unique sentences
   for (let i = 0; i < sentenceArray.length; i++) {
     let sentence = sentenceArray[i].trim();
-    let punctuation = punctuationArray[i];
+    let punctuation = punctuationArray ? punctuationArray[i] : ''; // Handle case when punctuationArray is null
     if (i === sentenceArray.length - 1) {
       // Check if the last sentence ends with ".", ",", "?", or "!"
       let lastChar = sentence.charAt(sentence.length - 1);
@@ -284,7 +201,7 @@ function filterResponse(responseText) {
     // Add the sentence to the unique set if it's not already there
     if (!uniqueSentenceSet.has(sentence)) {
       uniqueSentenceSet.add(sentence);
-      uniqueSentences.push(sentence + (punctuation ? punctuation : '')); // Include original punctuation
+      uniqueSentences.push(sentence + punctuation); // Include original punctuation
     }
   }
 
