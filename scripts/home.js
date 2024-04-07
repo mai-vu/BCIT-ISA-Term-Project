@@ -104,6 +104,11 @@ async function getUsageCount() {
 
     if (response.status === 200) {
       const data = await response.json();
+      // Check if the response contains the x-key-warning header
+      const xKeyWarning = response.headers.get('x-key-warning');
+      if (xKeyWarning) {
+        displayWarningIfNeeded(xKeyWarning);
+      }
       if (data && userRole === 'user') {
         usageCount = data.usage; // Update global usageCount
         updateUsageDisplay();
@@ -127,28 +132,24 @@ async function getUsageCount() {
 function updateUsageDisplay() {
   // Update the UI to display the usage count
   document.getElementById('usageCount').textContent = messages.usageCount + usageCount;
-  displayWarningIfNeeded(usageCount);
 }
 
-function displayWarningIfNeeded(count) {
+function displayWarningIfNeeded(warning) {
   // Remove any existing warning messages
   removeExistingWarnings();
 
-  // Display a warning message if the usage count exceeds the API_LIMIT
-  if (count >= API_LIMIT) {
-    // Create a warning message element
-    let warning = document.createElement('div');
-    warning.classList.add('text-danger'); // Add text-danger class for styling
+  let warningDiv = document.createElement('div');
+  warningDiv.classList.add('text-danger'); // Add text-danger class for styling
 
-    // Set the warning message content
-    warning.textContent = messages.usageWarning;
+  // Set the warning message content
+  warningDiv.textContent = warning;
 
-    // Get the warning container element
-    let warningContainer = document.getElementById('warningContainer');
+  // Get the warning container element
+  let warningContainer = document.getElementById('warningContainer');
 
-    // Append the warning message to the warning container
-    warningContainer.appendChild(warning);
-  }
+  // Append the warning message to the warning container
+  warningContainer.appendChild(warningDiv);
+  
 }
 
 function removeExistingWarnings() {
@@ -225,6 +226,12 @@ async function checkConversationAndDisplay() {
       }
       return [];
     } else if (response.status === 200) {
+      // Check if the response contains the x-key-warning header
+      const xKeyWarning = response.headers.get('x-key-warning');
+      if (xKeyWarning) {
+        displayWarningIfNeeded(xKeyWarning);
+      }
+
       const data = await response.json(); // Return the conversation messages
       if (data && data.convoMessage) {
         if (!convoExisted) {
@@ -267,6 +274,12 @@ document.getElementById('deleteButton').addEventListener('click', async function
       });
 
       if (response.ok) {
+        // Check if the response contains the x-key-warning header
+        const xKeyWarning = response.headers.get('x-key-warning');
+        if (xKeyWarning) {
+          displayWarningIfNeeded(xKeyWarning);
+        }
+
         // Update the conversation existence status
         convoExisted = await updateConvoExisted(false);
         // Clear the chatbox
@@ -289,8 +302,9 @@ document.getElementById('deleteButton').addEventListener('click', async function
 
 // Function to handle form submission
 async function handleSubmit() {
-  //disable the submit button
+  //disable the submit button and delete button while waiting for the response
   document.getElementById('submitButton').disabled = true;
+  document.getElementById('deleteButton').disabled = true;
 
   // Get the user input
   let text = document.getElementById('userInput').value;
@@ -334,6 +348,12 @@ async function handleSubmit() {
     if (!response.ok) {
       throw new Error(responseData.message || 'Failed to get response');
     } else {
+      // Check if the response contains the x-key-warning header
+      const xKeyWarning = response.headers.get('x-key-warning');
+      if (xKeyWarning) {
+        displayWarningIfNeeded(xKeyWarning);
+      }
+
       if (!convoExisted) {
         convoExisted = await updateConvoExisted(true);
         document.getElementById('deleteButton').disabled = false; // Enable the delete button
@@ -357,8 +377,9 @@ async function handleSubmit() {
       // // Create a new chat bubble for the chatbot response
       displayMessage(filteredResponse, false); // Display the chatbot response
 
-      // enable the submit button
+      // enable the submit button and delete button after the response is displayed
       document.getElementById('submitButton').disabled = false;
+      document.getElementById('deleteButton').disabled = false;
 
     }
   } catch (error) {
