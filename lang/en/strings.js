@@ -4,6 +4,7 @@ export const messages = {
     header: "ChatAMAT",
     footer: "By Team pU2",
     usageCount: "Usage Count: ", 
+    usageWarning: "Warning: You've used up the number of available request for this api key. Please request a new one.",
 
     // Landing Page
     email: "Email",

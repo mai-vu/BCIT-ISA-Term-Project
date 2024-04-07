@@ -1,7 +1,7 @@
 // Import the messages object from lang/en/strings.js
 import { messages } from '../lang/en/strings.js';
 
-
+const API_LIMIT = 20;
 const apiKeyUrlConsumption = "https://www.alexkong.xyz/proj/api/consumption";
 const apiUrlConvo = "https://www.alexkong.xyz/proj/convo";
 // const apiUrlConvo = "http://localhost:3000/proj/convo";
@@ -91,6 +91,8 @@ async function getUserRole() {
 }
 const userRole = await getUserRole();
 
+let usageCount = 0; // Define global usageCount variable
+
 async function getUsageCount() {
   try {
     const response = await fetch(apiKeyUrlConsumption, {
@@ -105,12 +107,14 @@ async function getUsageCount() {
       const data = await response.json();
       console.log('Usage count:', data);
       if (data && userRole === 'user') {
-        document.getElementById('usageCount').textContent = messages.usageCount + data.usage;
+        usageCount = data.usage; // Update global usageCount
+        updateUsageDisplay();
       } else if (data && data.stats && userRole === 'admin') {
         // Iterate through the stats array and display count for the admin
         data.stats.forEach(stat => {
           if (stat['api-key'] === apiKey) {
-            document.getElementById('usageCount').textContent = messages.usageCount + stat.usage;
+            usageCount = stat.usage; // Update global usageCount
+            updateUsageDisplay();
           } else {
             console.log('API Key not matched:');
           }
@@ -121,9 +125,44 @@ async function getUsageCount() {
     console.error('Error getting usage count:', error);
   }
 }
+
+function updateUsageDisplay() {
+  // Update the UI to display the usage count
+  document.getElementById('usageCount').textContent = messages.usageCount + usageCount;
+  displayWarningIfNeeded(usageCount);
+}
+
+function displayWarningIfNeeded(count) {
+  // Remove any existing warning messages
+  removeExistingWarnings();
+
+  // Display a warning message if the usage count exceeds the API_LIMIT
+  if (count >= API_LIMIT) {
+    // Create a warning message element
+    let warning = document.createElement('div');
+    warning.classList.add('text-danger'); // Add text-danger class for styling
+
+    // Set the warning message content
+    warning.textContent = messages.usageWarning;
+
+    // Get the warning container element
+    let warningContainer = document.getElementById('warningContainer');
+
+    // Append the warning message to the warning container
+    warningContainer.appendChild(warning);
+  }
+}
+
+function removeExistingWarnings() {
+  // Remove any existing warning messages
+  let existingWarnings = document.querySelectorAll('#warningContainer .text-danger');
+  existingWarnings.forEach(warning => {
+    warning.remove();
+  });
+}
+
+// Call getUsageCount function to fetch and display the usage count
 getUsageCount();
-
-
 
 async function getConvoExisted() {
   try {
@@ -203,6 +242,8 @@ async function checkConversationAndDisplay() {
           displayMessage(text, message.byUser); // Assuming message object has 'text' and 'sender' properties
         });
       }
+      usageCount++; // Increment the usage count
+      updateUsageDisplay(); // Update the usage display without increasing GET usage consumption
     }
   } catch (error) {
     console.error('Error checking conversation existence:', error);
@@ -235,6 +276,8 @@ document.getElementById('deleteButton').addEventListener('click', async function
         // Clear the chatbox
         document.getElementById('chatbox').innerHTML = '';
         document.getElementById('deleteButton').disabled = true; // Disable the delete button
+        usageCount++; // Increment the usage count
+        updateUsageDisplay(); // Update the usage display without increasing GET usage consumption
       } else {
         // Handle non-200 response status
         const errorMessage = await response.text();
@@ -301,6 +344,8 @@ async function handleSubmit() {
         document.getElementById('deleteButton').disabled = false; // Enable the delete button
         console.log('Conversation existed:', convoExisted);
       }
+      usageCount++; // Increment the usage count
+      updateUsageDisplay(); // Update the usage display without increasing GET usage consumption
     }
 
     // Remove the loading indicator
