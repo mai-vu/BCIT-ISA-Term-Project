@@ -98,6 +98,15 @@ app.get('/admin', (req, res) => {
         res.redirect('/');
         return;
     }
+
+    //check if user is admin
+    const role = req.session.role;
+    if (role !== 'admin') {
+        //if not admin, display alert and redirect to home
+        res.send('<script>alert("You are not authorized to access this page."); window.location.href = "/home";</script>');
+        return;
+    }
+
     jwt.verify(token, SECRET_KEY, async (error, decoded) => {
         if (error) {
             res.redirect('/');
@@ -252,7 +261,9 @@ app.post('/login', async (req, res) => {
 
         //get user uid and assign to session
         req.session.uid = existingUser._id.toString();
-        req.session.apiKey = existingUser.apiKey;
+
+        //get user's role and assign to session
+        req.session.role = existingUser.role;
 
         // Generate a JWT token for the user
         const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
