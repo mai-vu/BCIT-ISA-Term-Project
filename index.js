@@ -20,7 +20,7 @@ const SESSION_KEY = process.env.SESSION_KEY;
 
 app.use(session({
     secret: SESSION_KEY,
-    resave: false,
+    resave: true,
     saveUninitialized: true
 }));
 app.use(cookieParser());
@@ -38,6 +38,25 @@ async function connectToDatabase() {
     return client.db(db).collection('users');
 }
 
+async function createAPIKey() {
+    try {
+        const response = await fetch('https://www.alexkong.xyz/proj/api-key', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to get API key');
+        }
+        const data = await response.json();
+        const apiKey = data['api-key'];
+        return apiKey; // Return the API key
+    } catch (error) {
+        console.error('Error:', error);
+        throw error; // Re-throw the error for handling elsewhere if needed
+    }
+}
 
 // Use the Password-related Route Handler
 app.use('/password', passwordRouter);
@@ -105,32 +124,6 @@ app.get('/admin/users', async (req, res) => {
     }
 });
 
-
-app.get('/users/usagecount', async (req, res) => {
-    try {
-        const email = req.session.email;
-
-        // Connect to the database
-        const usersCollection = await connectToDatabase();
-
-        // Find the user by email
-        const user = await usersCollection.findOne({ email });
-
-        if (!user) {
-            res.status(404).json({ error: 'User not found' });
-            return;
-        }
-
-        // Retrieve the API_calls count for the user
-        const apiCalls = user.API_calls || 0;
-
-        res.json({ apiCalls }); // Send the API_calls count as JSON response
-    } catch (error) {
-        console.error('Error fetching API calls count:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 app.get('/users/role', async (req, res) => {
     try {
         const email = req.session.email;
@@ -154,6 +147,82 @@ app.get('/users/role', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.get('/users/apikey', async (req, res) => {
+    try {
+        const email = req.session.email;
+
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const apiKey = user['api-key'];
+
+        res.json({ apiKey }); // Send the user's role as JSON response
+    } catch (error) {
+        console.error('Error fetching API calls count:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/users/convoExisted', async (req, res) => {
+    try {
+        const email = req.session.email;
+
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const convoExisted = user.convoExisted;
+
+        res.json({ convoExisted }); // Send the user's convoExisted boolean as JSON response
+    } catch (error) {
+        console.error('Error fetching API calls count:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.put('/users/convoExisted', async (req, res) => {
+    try {
+        const email = req.session.email;
+
+        // Connect to the database
+        const usersCollection = await connectToDatabase();
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const convoExisted = req.body.convoExisted;
+
+        // Update the user's convoExisted boolean
+        await usersCollection.updateOne({ email }, { $set: { convoExisted: req.body.convoExisted } });
+
+        res.json({ convoExisted }); // Send success response
+    } catch (error) {
+        console.error('Error updating conversation existence:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+);
 
 // Login Route
 app.post('/login', async (req, res) => {
@@ -183,6 +252,7 @@ app.post('/login', async (req, res) => {
 
         //get user uid and assign to session
         req.session.uid = existingUser._id.toString();
+        req.session.apiKey = existingUser.apiKey;
 
         // Generate a JWT token for the user
         const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
@@ -220,8 +290,10 @@ app.post('/signup', async (req, res) => {
             return;
         }
 
+        const apiKey = await createAPIKey();
+
         // Insert the new user into the database with hashed password
-        await usersCollection.insertOne({ email, password: hashedPassword, API_calls: 0, role: 'user'});
+        await usersCollection.insertOne({ email: email, password: hashedPassword, role: 'user', 'api-key': apiKey, convoExisted: false});
 
         // Store email in session
         req.session.email = email;
