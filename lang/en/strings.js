@@ -5,6 +5,8 @@ export const messages = {
     footer: "By Team pU2",
     usageCount: "Usage Count: ", 
     usageWarning: "Warning: You've used up the number of available request for this api key. Please request a new one.",
+    apiKeyUrlConsumption: "https://www.alexkong.xyz/proj/api/consumption",
+    apiUrlConvo: "https://www.alexkong.xyz/proj/convo",
 
     // Landing Page
     email: "Email",
@@ -22,6 +24,7 @@ export const messages = {
     home: "Chatbot Home",
     submitButton: "Submit",
     deleteButton: "Delete Conversation",
+    defaultResponse: "I'm sorry, I don't have an answer at the moment. Can you please try again later?",
 
     // Admin Dashboard
     adminTitle: "Admin Dashboard",

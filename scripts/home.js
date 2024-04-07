@@ -2,9 +2,8 @@
 import { messages } from '../lang/en/strings.js';
 
 const API_LIMIT = 20;
-const apiKeyUrlConsumption = "https://www.alexkong.xyz/proj/api/consumption";
-const apiUrlConvo = "https://www.alexkong.xyz/proj/convo";
-// const apiUrlConvo = "http://localhost:3000/proj/convo";
+const apiKeyUrlConsumption = messages.apiKeyUrlConsumption;
+const apiUrlConvo = messages.apiUrlConvo;
 
 
 // Function to replace element contents with strings from messages object
@@ -105,7 +104,6 @@ async function getUsageCount() {
 
     if (response.status === 200) {
       const data = await response.json();
-      console.log('Usage count:', data);
       if (data && userRole === 'user') {
         usageCount = data.usage; // Update global usageCount
         updateUsageDisplay();
@@ -225,7 +223,6 @@ async function checkConversationAndDisplay() {
       if (convoExisted) {
         convoExisted = await updateConvoExisted(false); // Set convoExisted to false if conversation does not exist
       }
-      console.log('Conversation does not exist');
       return [];
     } else if (response.status === 200) {
       const data = await response.json(); // Return the conversation messages
@@ -272,7 +269,6 @@ document.getElementById('deleteButton').addEventListener('click', async function
       if (response.ok) {
         // Update the conversation existence status
         convoExisted = await updateConvoExisted(false);
-        console.log('Conversation existed:', convoExisted);
         // Clear the chatbox
         document.getElementById('chatbox').innerHTML = '';
         document.getElementById('deleteButton').disabled = true; // Disable the delete button
@@ -322,7 +318,6 @@ async function handleSubmit() {
 
   console.log('HTTP Method:', httpMethod);
 
-  console.log("apiKey: ", apiKey);
   try {
     // Send the user input to the server
     const response = await fetch(apiUrlConvo, {
@@ -342,7 +337,6 @@ async function handleSubmit() {
       if (!convoExisted) {
         convoExisted = await updateConvoExisted(true);
         document.getElementById('deleteButton').disabled = false; // Enable the delete button
-        console.log('Conversation existed:', convoExisted);
       }
       usageCount++; // Increment the usage count
       updateUsageDisplay(); // Update the usage display without increasing GET usage consumption
@@ -351,13 +345,11 @@ async function handleSubmit() {
     // Remove the loading indicator
     document.getElementById('chatbox').removeChild(loadingBubble);
 
-    console.log('Response:', responseData);
-
     // Process the response and filter repetitive text
     let filteredResponse = filterResponse(responseData.messages[1].text);
 
     if (!filteredResponse) {
-      filteredResponse = "I'm sorry, I didn't understand that. Can you please rephrase?";
+      filteredResponse = messages.defaultResponse;
     }
 
     // Check if the filtered response is not empty
@@ -374,7 +366,7 @@ async function handleSubmit() {
     if (loadingBubble) {
       document.getElementById('chatbox').removeChild(loadingBubble);
     }
-    displayMessage("I'm sorry, there was an error processing your request. Please try again later.", false);
+    displayMessage(messages.defaultResponse, false);
   }
 }
 
