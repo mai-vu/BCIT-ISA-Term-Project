@@ -46,12 +46,28 @@ async function fetchUsersData() {
     }
 }
 
+async function calculateTotalUsage() {
+    const apiUsageData = await fetchApiUsageData();
+    const totalUsage = {};
+
+    apiUsageData.forEach(entry => {
+        const { 'api-key': apiKey, usage } = entry;
+        totalUsage[apiKey] = totalUsage[apiKey] ? totalUsage[apiKey] + usage : usage;
+    });
+
+    console.log(totalUsage); // Log the totalUsage object
+    return totalUsage;
+}
+
+
 // Function to populate the table with users data
 async function populateUserTable() {
     const usersList = document.querySelector('#userTable tbody');
 
     // Fetch users data from the server
     const usersData = await fetchUsersData();
+    const totalUsage = await calculateTotalUsage();
+
 
     // Clear existing table rows
     usersList.innerHTML = '';
@@ -62,7 +78,7 @@ async function populateUserTable() {
             <tr>
                 <td>${user.email}</td>
                 <td>${user['api-key']}</td>
-                <td>${user.role}</td>
+                <td>${totalUsage[user['api-key']] || 0}</td>
             </tr>
         `;
         usersList.innerHTML += row;

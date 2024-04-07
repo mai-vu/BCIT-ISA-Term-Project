@@ -38,6 +38,13 @@ async function connectToDatabase() {
     return client.db(db).collection('users');
 }
 
+// Function to connect to MongoDB for API usage data
+async function connectToDatabaseForUsage() {
+    const client = new MongoClient(mongoURI);
+    await client.connect();
+    return client.db(db).collection('usage');
+}
+
 async function createAPIKey() {
     try {
         const response = await fetch('https://www.alexkong.xyz/proj/api-key', {
@@ -132,6 +139,24 @@ app.get('/admin/users', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+// Fetch usage data for the API keys
+app.get('/admin/api-usage', async (req, res) => {
+    try {
+        // Connect to the database
+        const usageCollection = await connectToDatabaseForUsage();
+
+        // Fetch API usage data
+        const apiUsageData = await usageCollection.find().toArray();
+
+        // Send the API usage data as JSON response
+        res.json(apiUsageData);
+    } catch (error) {
+        console.error('Error fetching API usage data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 app.get('/users/role', async (req, res) => {
     try {
