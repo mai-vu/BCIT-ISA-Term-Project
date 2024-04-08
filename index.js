@@ -38,21 +38,6 @@ async function connectToDatabase() {
     return client.db(db).collection('users');
 }
 
-// Function to connect to MongoDB for API usage data
-async function connectToDatabaseForUsage() {
-    const client = new MongoClient(mongoURI);
-    await client.connect();
-    return client.db(db).collection('usage');
-}
-
-// Function to connect to MongoDB for endpoint stats
-async function connectToDatabaseForStats() {
-    const client = new MongoClient(mongoURI);
-    await client.connect();
-    return client.db(db).collection('stats');
-
-}
-
 async function createAPIKey() {
     try {
         const response = await fetch('https://www.alexkong.xyz/proj/api-key', {
@@ -144,40 +129,6 @@ app.get('/admin/users', async (req, res) => {
         res.json(users);
     } catch (error) {
         console.error('Error fetching users data:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// Fetch usage data for the API keys
-app.get('/admin/api-usage', async (req, res) => {
-    try {
-        // Connect to the database
-        const usageCollection = await connectToDatabaseForUsage();
-
-        // Fetch API usage data
-        const apiUsageData = await usageCollection.find().toArray();
-
-        // Send the API usage data as JSON response
-        res.json(apiUsageData);
-    } catch (error) {
-        console.error('Error fetching API usage data:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// Fetch usage data for each endpoint
-app.get('/admin/endpoint-usage', async (req, res) => {
-    try {
-        // Connect to the database
-        const statsCollection = await connectToDatabaseForStats();
-
-        // Fetch endpoint usage data
-        const endpointUsageData = await statsCollection.find().toArray();
-
-        // Send the endpoint usage data as JSON response
-        res.json(endpointUsageData);
-    } catch (error) {
-        console.error('Error fetching endpoint usage data:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
