@@ -93,7 +93,7 @@ async function getApiUsageData() {
     }
 }
 const usageData = await getApiUsageData();
-console.log('API Usage Data:', usageData);
+// console.log('API Usage Data:', usageData);
 
 // Function to calculate total usage for each endpoint
 async function getEndpointUsage() {
@@ -130,7 +130,7 @@ async function populateEndpointTable() {
 
     // Fetch endpoint usage data from the server
     const endpointData = await getEndpointUsage();
-    console.log('Endpoint Data:', endpointData);
+    // console.log('Endpoint Data:', endpointData);
 
     // Clear existing table rows
     endpointList.innerHTML = '';
