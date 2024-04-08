@@ -1,8 +1,7 @@
 // Import the messages object from lang/en/strings.js
 import { messages } from '../lang/en/strings.js';
 
-// Hardcode the DB_URL for now, or retrieve it from a different source
-const dbUrl = "mongodb+srv://isa:nsk1BTC6XDC2AFfe@isa.aobezkp.mongodb.net/?retryWrites=true&w=majority&appName=isa";
+const apiUsageDataUrl = "https://www.alexkong.xyz/proj/api/consumption";
 
 // Function to replace element contents with strings from messages object
 function replaceElementContents() {
@@ -21,6 +20,93 @@ function replaceElementContents() {
 document.addEventListener('DOMContentLoaded', () => {
     replaceElementContents();
 });
+
+// Get API key
+async function getApiKey() {
+    try {
+        const response = await fetch('/users/apikey', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.status === 200) {
+            const data = await response.json();
+            return data.apiKey;
+        } else {
+            console.error('Failed to get API key. Status:', response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error getting API key:', error);
+        return null;
+    }
+}
+
+const apiKey = getApiKey();
+
+async function getApiUsageData() {
+    try {
+        const response = await fetch(apiUsageDataUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey
+            },
+        });
+
+        if (response.status === 200) {
+            const data = await response.json();
+            console.log('Usage count:', data);
+
+            if (userRole === 'user') {
+                if (data && data.usage !== undefined) {
+                    usageCount = data.usage; // Update global usageCount
+                    updateUsageDisplay();
+                } else {
+                    console.error('Invalid data format:', data);
+                }
+            } else if (userRole === 'admin') {
+                if (data && data.stats instanceof Array) {
+                    const userStats = data.stats.find(stat => stat['api-key'] === apiKey);
+                    if (userStats) {
+                        usageCount = userStats.usage; // Update global usageCount
+                        updateUsageDisplay();
+                    } else {
+                        console.error('API key not found in stats:', apiKey);
+                    }
+                } else {
+                    console.error('Invalid data format:', data);
+                }
+            }
+        } else {
+            console.error('Failed to fetch API usage data. Status:', response.status);
+        }
+    } catch (error) {
+        console.error('Error getting usage count:', error);
+    }
+}
+
+async function getUserRole() {
+    try {
+      const response = await fetch('/users/role', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.status === 200) {
+        const data = await response.json();
+        return data.role;
+      }
+    } catch (error) {
+      console.error('Error getting user role:', error);
+    }
+  }
+
+  const userRole = getUserRole();
 
 // Function to fetch API usage data
 async function fetchApiUsageData() {
@@ -101,7 +187,6 @@ async function populateEndpointTable() {
 
     // Fetch endpoint usage data from the server
     const endpointData = await fetchEndpointUsage();
-    console.log('endpoint data', endpointData);
 
     // Clear existing table rows
     endpointList.innerHTML = '';
@@ -119,8 +204,5 @@ async function populateEndpointTable() {
     });
 }
 
-// Call populateUserTable() and populateEndpointTable() when the page loads
-window.onload = function() {
-    populateUserTable();
-    populateEndpointTable();
-};
+populateUserTable();
+populateEndpointTable();
