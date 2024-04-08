@@ -169,6 +169,7 @@ async function patchUser(apiKey) {
             console.log('User patched successfully');
             // Instead of reloading, just re-populate the user table
             await populateUserTable();
+            await populateEndpointTable();
             console.log("User table repopulated");
         } else {
             console.error('Failed to patch user. Status:', response.status);
