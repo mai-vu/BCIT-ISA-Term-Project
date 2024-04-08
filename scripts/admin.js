@@ -162,7 +162,7 @@ async function populateUserTable() {
                 <td>${user.email}</td>
                 <td>${user['api-key']}</td>
                 <td>${user.usage || 0}</td>
-                <td><button class="patchButton" data-api-key="${user['api-key']}">PATCH</button></td>
+                <td><button class="patchButton" data-api-key="${user['api-key']}">New Key</button></td>
             </tr>
         `;
         usersList.innerHTML += row;
