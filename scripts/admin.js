@@ -46,28 +46,28 @@ async function getApiKey() {
 }
 const apiKey = await getApiKey(); // Wait for the promise to resolve
 
-// function to get users
-async function getUsers() {
-    try {
-        const response = await fetch('/admin/users', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+// // function to get users
+// async function getUsers() {
+//     try {
+//         const response = await fetch('/admin/users', {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//         });
 
-        if (response.status === 200) {
-            const data = await response.json();
-            return data;
-        } else {
-            console.error('Failed to get users. Status:', response.status);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error getting users:', error);
-        return null;
-    }
-}
+//         if (response.status === 200) {
+//             const data = await response.json();
+//             return data;
+//         } else {
+//             console.error('Failed to get users. Status:', response.status);
+//             return null;
+//         }
+//     } catch (error) {
+//         console.error('Error getting users:', error);
+//         return null;
+//     }
+// }
 
 async function getApiUsageData() {
     try {
@@ -91,30 +91,12 @@ async function getApiUsageData() {
     }
 }
 
-async function calculateUsagePerUser() {
-    // Await both promises to ensure data is fetched before proceeding
-    const usageData = await getApiUsageData();
-    const users = await getUsers();
+// Call the function to initiate the request
+const usageData = await getApiUsageData();
+console.log('API Usage Data:', usageData);
 
-    console.log('Usage Data:', usageData);
-    console.log('Users:', users);
-    
-    const usagePerUser = users.map(user => {
-        const userUsage = usageData.find(usage => usage['api-key'] === user['api-key']);
-        return {
-            email: user.email,
-            'api-key': user['api-key'],
-            usage: userUsage ? userUsage.count : 0
-        };
-    });
-
-    return usagePerUser;
-}
-
-const usagePerUser = await calculateUsagePerUser();
-console.log('Usage Per User:', usagePerUser);
-
-
+// const users = await getUsers();
+// console.log('Users:', users);
 
 // Function to calculate total usage for each endpoint
 async function getEndpointUsage() {
@@ -177,7 +159,7 @@ async function populateUserTable() {
     usersList.innerHTML = '';
 
     // Iterate over each user and create table rows
-    usagePerUser.forEach(user => {
+    usageData.forEach(user => {
         const row = `
             <tr>
                 <td>${user.email}</td>
