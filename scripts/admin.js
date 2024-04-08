@@ -10,9 +10,11 @@ function replaceElementContents() {
     // Replace title
     document.getElementById('title').textContent = messages.adminTitle;
     document.getElementById('logoutButton').textContent = messages.logout;
+    document.getElementById('endpointTableHeader').textContent = messages.endpointTableHeader;
     document.getElementById('tableHeaderMethod').textContent = messages.tableHeaderMethod;
     document.getElementById('tableHeaderEndpoint').textContent = messages.tableHeaderEndpoint;
     document.getElementById('tableHeaderRequests').textContent = messages.tableHeaderRequests;
+    document.getElementById('userTableHeader').textContent = messages.userTableHeader;
     document.getElementById('tableHeaderEmail').textContent = messages.tableHeaderEmail;
     document.getElementById('tableHeaderApiKey').textContent = messages.tableHeaderApiKey;
     document.getElementById('tableHeaderUsageCount').textContent = messages.tableHeaderUsageCount;
