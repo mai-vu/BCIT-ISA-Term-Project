@@ -44,32 +44,7 @@ async function getApiKey() {
         return null;
     }
 }
-const apiKey = await getApiKey(); // Wait for the promise to resolve
-
-// // function to get users
-// async function getUsers() {
-//     try {
-//         const response = await fetch('/admin/users', {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//         });
-
-//         if (response.status === 200) {
-//             const data = await response.json();
-//             return data;
-//         } else {
-//             console.error('Failed to get users. Status:', response.status);
-//             return null;
-//         }
-//     } catch (error) {
-//         console.error('Error getting users:', error);
-//         return null;
-//     }
-// }
-// const users = await getUsers();
-// console.log('Users:', users);
+const apiKey = await getApiKey();
 
 async function getApiUsageData() {
     try {
@@ -92,8 +67,6 @@ async function getApiUsageData() {
         return null;
     }
 }
-const usageData = await getApiUsageData();
-// console.log('API Usage Data:', usageData);
 
 // Function to calculate total usage for each endpoint
 async function getEndpointUsage() {
@@ -124,7 +97,6 @@ async function getEndpointUsage() {
     }
 }
 
-
 async function populateEndpointTable() {
     const endpointList = document.querySelector('#endpointTable tbody');
 
@@ -148,12 +120,13 @@ async function populateEndpointTable() {
     });
 }
 
-// Function to populate the table with users data
 async function populateUserTable() {
     const usersList = document.querySelector('#userTable tbody');
 
     // Clear existing table rows
     usersList.innerHTML = '';
+
+    const usageData = await getApiUsageData();
 
     // Iterate over each user and create table rows
     usageData.forEach(user => {
@@ -178,7 +151,7 @@ async function populateUserTable() {
     });
 }
 
-// Function to perform PATCH request
+// PATCH user to replace API key
 async function patchUser(apiKey) {
     try {
         const response = await fetch(patchUrl, {
@@ -191,7 +164,9 @@ async function patchUser(apiKey) {
 
         if (response.status === 200) {
             console.log('User patched successfully');
-            location.reload(); // Reload the page to show updated data
+            // Instead of reloading, just re-populate the user table
+            await populateUserTable();
+            console.log("User table repopulated");
         } else {
             console.error('Failed to patch user. Status:', response.status);
         }
