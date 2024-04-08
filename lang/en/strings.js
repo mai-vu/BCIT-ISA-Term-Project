@@ -29,7 +29,11 @@ export const messages = {
     // Admin Dashboard
     adminTitle: "Admin Dashboard",
     tableHeaderEmail: "Email",
+    tableHeaderApiKey: "API Key",
     tableHeaderUsageCount: "Usage Count",
+    tableHeaderMethod: "Method",
+    tableHeaderEndpoint: "Endpoint",
+    tableHeaderRequests: "Requests",
 
     // Forgot Password
     noEmail: "No email provided. Please enter your email to reset password.",
