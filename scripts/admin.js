@@ -91,14 +91,14 @@ async function getApiUsageData() {
     }
 }
 
-// Call the function to initiate the request
-const usageData = await getApiUsageData();
-console.log('API Usage Data:', usageData);
-
-const users = await getUsers();
-console.log('Users:', users);
-
 async function calculateUsagePerUser() {
+    // Await both promises to ensure data is fetched before proceeding
+    const usageData = await getApiUsageData();
+    const users = await getUsers();
+
+    console.log('Usage Data:', usageData);
+    console.log('Users:', users);
+    
     const usagePerUser = users.map(user => {
         const userUsage = usageData.find(usage => usage['api-key'] === user['api-key']);
         return {
@@ -113,6 +113,8 @@ async function calculateUsagePerUser() {
 
 const usagePerUser = await calculateUsagePerUser();
 console.log('Usage Per User:', usagePerUser);
+
+
 
 // Function to calculate total usage for each endpoint
 async function getEndpointUsage() {
