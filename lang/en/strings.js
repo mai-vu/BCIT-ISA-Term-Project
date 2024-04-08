@@ -25,6 +25,7 @@ export const messages = {
     submitButton: "Submit",
     deleteButton: "Delete Conversation",
     defaultResponse: "I'm sorry, I don't have an answer at the moment. Can you please try again later?",
+    homeUnauth: '<script>alert("You are not authorized to access this page."); window.location.href = "/";</script>',
 
     // Admin Dashboard
     adminTitle: "Admin Dashboard",
@@ -34,6 +35,7 @@ export const messages = {
     tableHeaderMethod: "Method",
     tableHeaderEndpoint: "Endpoint",
     tableHeaderRequests: "Requests",
+    adminUnauth: '<script>alert("You are not authorized to access this page. Please log in again"); window.location.href = "/home";</script>',
 
     // Forgot Password
     noEmail: "No email provided. Please enter your email to reset password.",

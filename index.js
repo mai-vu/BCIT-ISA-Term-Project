@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import passwordRouter from './routes/passwordRouter.js'; 
+// Import the messages object from lang/en/strings.js
+import { messages } from './lang/en/strings.js';
 
 dotenv.config();
 const mongoURI = process.env.DB_URL;
@@ -103,7 +105,7 @@ app.get('/admin', (req, res) => {
     const role = req.session.role;
     if (role !== 'admin') {
         //if not admin, display alert and redirect to home
-        res.send('<script>alert("You are not authorized to access this page."); window.location.href = "/home";</script>');
+        res.send(messages.adminUnauth);
         return;
     }
 
@@ -154,6 +156,7 @@ app.get('/users/role', async (req, res) => {
     } catch (error) {
         console.error('Error fetching API calls count:', error);
         res.status(500).json({ error: 'Internal server error' });
+        res.send(messages.homeUnauth);
     }
 });
 
