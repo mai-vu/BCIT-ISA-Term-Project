@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     replaceElementContents();
 });
 
-// Get API key
 async function getApiKey() {
     try {
         const response = await fetch('/users/apikey', {
@@ -69,6 +68,8 @@ const apiKey = await getApiKey(); // Wait for the promise to resolve
 //         return null;
 //     }
 // }
+// const users = await getUsers();
+// console.log('Users:', users);
 
 async function getApiUsageData() {
     try {
@@ -91,13 +92,8 @@ async function getApiUsageData() {
         return null;
     }
 }
-
-// Call the function to initiate the request
 const usageData = await getApiUsageData();
 console.log('API Usage Data:', usageData);
-
-// const users = await getUsers();
-// console.log('Users:', users);
 
 // Function to calculate total usage for each endpoint
 async function getEndpointUsage() {
@@ -203,8 +199,6 @@ async function patchUser(apiKey) {
         console.error('Error patching user:', error);
     }
 }
-
-
 
 populateEndpointTable();
 populateUserTable();
