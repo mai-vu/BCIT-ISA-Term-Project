@@ -46,10 +46,10 @@ async function getApiKey() {
         return null;
     }
 }
-const apiKey = await getApiKey();
 
 async function getApiUsageData() {
     try {
+        const apiKey = await getApiKey();
         const response = await fetch(apiUsageDataUrl, {
             method: 'GET',
             headers: {
@@ -73,6 +73,7 @@ async function getApiUsageData() {
 // Function to calculate total usage for each endpoint
 async function getEndpointUsage() {
     try {
+        const apiKey = await getApiKey();
         const response = await fetch(endpointStatsUrl, {
             method: 'GET',
             headers: {
