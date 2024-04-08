@@ -29,6 +29,8 @@ export const messages = {
 
     // Admin Dashboard
     adminTitle: "Admin Dashboard",
+    endpointTableHeader: "Endpoint Usage",
+    userTableHeader: "User Calls",
     tableHeaderEmail: "Email",
     tableHeaderApiKey: "API Key",
     tableHeaderUsageCount: "Usage Count",

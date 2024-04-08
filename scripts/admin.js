@@ -10,9 +10,11 @@ function replaceElementContents() {
     // Replace title
     document.getElementById('title').textContent = messages.adminTitle;
     document.getElementById('logoutButton').textContent = messages.logout;
+    document.getElementById('endpointTableHeader').textContent = messages.endpointTableHeader;
     document.getElementById('tableHeaderMethod').textContent = messages.tableHeaderMethod;
     document.getElementById('tableHeaderEndpoint').textContent = messages.tableHeaderEndpoint;
     document.getElementById('tableHeaderRequests').textContent = messages.tableHeaderRequests;
+    document.getElementById('userTableHeader').textContent = messages.userTableHeader;
     document.getElementById('tableHeaderEmail').textContent = messages.tableHeaderEmail;
     document.getElementById('tableHeaderApiKey').textContent = messages.tableHeaderApiKey;
     document.getElementById('tableHeaderUsageCount').textContent = messages.tableHeaderUsageCount;
@@ -44,10 +46,10 @@ async function getApiKey() {
         return null;
     }
 }
-const apiKey = await getApiKey();
 
 async function getApiUsageData() {
     try {
+        const apiKey = await getApiKey();
         const response = await fetch(apiUsageDataUrl, {
             method: 'GET',
             headers: {
@@ -71,6 +73,7 @@ async function getApiUsageData() {
 // Function to calculate total usage for each endpoint
 async function getEndpointUsage() {
     try {
+        const apiKey = await getApiKey();
         const response = await fetch(endpointStatsUrl, {
             method: 'GET',
             headers: {
@@ -166,6 +169,7 @@ async function patchUser(apiKey) {
             console.log('User patched successfully');
             // Instead of reloading, just re-populate the user table
             await populateUserTable();
+            await populateEndpointTable();
             console.log("User table repopulated");
         } else {
             console.error('Failed to patch user. Status:', response.status);
