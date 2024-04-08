@@ -99,18 +99,6 @@ console.log('API Usage Data:', usageData);
 const users = await getUsers();
 console.log('Users:', users);
 
-// Function to fetch API usage data
-async function fetchApiUsageData() {
-    try {
-        const response = await fetch('/admin/api-usage');
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching API usage data:', error);
-        return [];
-    }
-}
-
 // Function to calculate total usage for each endpoint
 async function getEndpointUsage() {
     try {
