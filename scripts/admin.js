@@ -3,6 +3,7 @@ import { messages } from '../lang/en/strings.js';
 
 const endpointStatsUrl = "https://www.alexkong.xyz/proj/api/stats";
 const apiUsageDataUrl = "https://www.alexkong.xyz/proj/api/consumption";
+const patchUrl = "https://www.alexkong.xyz/proj/api-key";
 
 // Function to replace element contents with strings from messages object
 function replaceElementContents() {
@@ -165,11 +166,43 @@ async function populateUserTable() {
                 <td>${user.email}</td>
                 <td>${user['api-key']}</td>
                 <td>${user.usage || 0}</td>
+                <td><button class="patchButton" data-api-key="${user['api-key']}">PATCH</button></td>
             </tr>
         `;
         usersList.innerHTML += row;
     });
+
+    // Add event listener to all PATCH buttons
+    const patchButtons = document.querySelectorAll('.patchButton');
+    patchButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const apiKey = button.dataset.apiKey;
+            await patchUser(apiKey);
+        });
+    });
 }
+
+// Function to perform PATCH request
+async function patchUser(apiKey) {
+    try {
+        const response = await fetch(patchUrl, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey
+            }
+        });
+
+        if (response.status === 200) {
+            console.log('User patched successfully');
+        } else {
+            console.error('Failed to patch user. Status:', response.status);
+        }
+    } catch (error) {
+        console.error('Error patching user:', error);
+    }
+}
+
 
 populateEndpointTable();
 populateUserTable();
