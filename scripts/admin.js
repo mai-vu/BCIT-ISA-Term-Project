@@ -195,6 +195,7 @@ async function patchUser(apiKey) {
 
         if (response.status === 200) {
             console.log('User patched successfully');
+            location.reload(); // Reload the page to show updated data
         } else {
             console.error('Failed to patch user. Status:', response.status);
         }
@@ -202,6 +203,7 @@ async function patchUser(apiKey) {
         console.error('Error patching user:', error);
     }
 }
+
 
 
 populateEndpointTable();
